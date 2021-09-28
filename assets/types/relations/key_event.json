@@ -1,0 +1,10 @@
+{
+  "name": "key_event",
+  "description": "Key Event of an input device",
+  "outbound_type": "input_device",
+  "inbound_type": "input_device_key",
+  "components": [
+  ],
+  "properties": [
+  ]
+}
