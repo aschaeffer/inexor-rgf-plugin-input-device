@@ -1,0 +1,15 @@
+query {
+  instances {
+    input_device_keys: entities(entityType: "input_device_key") {
+      id
+      properties(
+        names: [
+          "name",
+          "key",
+          "keydown",
+          "keycode"
+        ]
+      )
+    }
+  }
+}

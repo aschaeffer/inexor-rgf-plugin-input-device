@@ -1,0 +1,17 @@
+query {
+  instances {
+    input_devices: entities(entityType: "input_device") {
+      id
+      properties(
+        names: [
+          "name",
+          "physical_path",
+          "driver_version",
+          "vendor",
+          "product",
+          "version"
+        ]
+      )
+    }
+  }
+}
