@@ -11,12 +11,12 @@
     {
       "name": "key",
       "data_type": "string",
-      "socket_type": "input"
+      "socket_type": "none"
     },
     {
       "name": "keycode",
       "data_type": "number",
-      "socket_type": "input"
+      "socket_type": "none"
     },
     {
       "name": "keydown",

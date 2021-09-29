@@ -1,0 +1,10 @@
+{
+  "name": "led_event",
+  "description": "LED Event of an input device",
+  "outbound_type": "input_device",
+  "inbound_type": "input_device_led",
+  "components": [
+  ],
+  "properties": [
+  ]
+}

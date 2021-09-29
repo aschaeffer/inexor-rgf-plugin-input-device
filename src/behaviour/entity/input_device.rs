@@ -4,22 +4,21 @@ use std::time::Duration;
 
 use crate::reactive::BehaviourCreationError;
 use async_std::task;
-use log::{debug, error, info, trace};
-use serde_json::{json, Error, Value};
+use log::{debug, error, trace};
+use serde_json::json;
 
 use crate::behaviour::entity::InputDeviceProperties;
 use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEYCODE,
+    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_VALUE,
+    KEY_EVENT_KEYCODE, LED_EVENT_LEDTYPE,
 };
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveEntityInstance;
 use crate::reactive::entity::Disconnectable;
-use evdev::{InputEvent, InputEventKind};
+use evdev::InputEventKind;
 use futures::FutureExt;
 use futures::{select, StreamExt};
 use futures_timer::Delay;
-
-const INPUT_DEVICE: &'static str = "input_device";
 
 pub struct DeviceInput {
     pub entity: Arc<ReactiveEntityInstance>,
@@ -100,10 +99,17 @@ impl DeviceInput {
                                             INPUT_EVENT_VALUE: event.value()
                                         }))
                                     }
+                                    InputEventKind::Led(led_type) => {
+                                        property_event.set(json!({
+                                            INPUT_EVENT_KIND: INPUT_EVENT_KIND_LED_EVENT,
+                                            LED_EVENT_LEDTYPE: led_type.0,
+                                            INPUT_EVENT_VALUE: event.value()
+                                        }))
+                                    }
                                     _ => {}
                                 }
                             }
-                            Some(Err(e)) => {
+                            Some(Err(_)) => {
                                 // debug!("Error: {:?}\r", e);
                             },
                             None => break,
@@ -127,7 +133,7 @@ impl DeviceInput {
 impl Disconnectable for DeviceInput {
     fn disconnect(&self) {
         debug!("Stopping thread handling input device");
-        self.stopper.send(());
+        let _ = self.stopper.send(());
     }
 }
 

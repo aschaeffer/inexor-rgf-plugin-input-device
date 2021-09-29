@@ -9,7 +9,17 @@
   ],
   "properties": [
     {
-      "name": "is_on",
+      "name": "led",
+      "data_type": "string",
+      "socket_type": "none"
+    },
+    {
+      "name": "ledtype",
+      "data_type": "number",
+      "socket_type": "none"
+    },
+    {
+      "name": "state",
       "data_type": "bool",
       "socket_type": "output"
     }

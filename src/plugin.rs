@@ -1,12 +1,13 @@
 use std::sync::{Arc, RwLock};
 
 use async_trait::async_trait;
-use log::{debug, error, info, trace};
+use log::{debug, error, trace};
 use waiter_di::*;
 
 use crate::behaviour::entity::entity_behaviour_provider::InputDeviceEntityBehaviourProviderImpl;
-use crate::behaviour::entity::InputDeviceKeyProperties;
 use crate::behaviour::relation::relation_behaviour_provider::InputDeviceRelationBehaviourProviderImpl;
+use crate::builder::{EntityInstanceBuilder, RelationInstanceBuilder};
+use crate::model::ReactiveEntityInstance;
 use crate::plugins::plugin::PluginMetadata;
 use crate::plugins::plugin_context::PluginContext;
 use crate::plugins::{
@@ -18,11 +19,7 @@ use crate::provider::{
     InputDeviceEntityTypeProviderImpl, InputDeviceFlowProviderImpl,
     InputDeviceRelationTypeProviderImpl,
 };
-use evdev::{Device, Key};
-use inexor_rgf_core_builder::{
-    EntityInstanceBuilder, ReactiveRelationInstanceBuilder, RelationInstanceBuilder,
-};
-use inexor_rgf_core_model::{PropertyInstanceGetter, ReactiveEntityInstance};
+use evdev::{Device, Key, LedType};
 use serde_json::json;
 use std::env;
 use uuid::Uuid;
@@ -33,7 +30,11 @@ const INPUT_DEVICE: &'static str = "input_device";
 
 const INPUT_DEVICE_KEY: &'static str = "input_device_key";
 
+const INPUT_DEVICE_LED: &'static str = "input_device_led";
+
 const KEY_EVENT: &'static str = "key_event";
+
+const LED_EVENT: &'static str = "led_event";
 
 #[wrapper]
 pub struct PluginContextContainer(RwLock<Option<std::sync::Arc<dyn PluginContext>>>);
@@ -59,17 +60,17 @@ pub struct InputDevicePluginImpl {
 
 impl InputDevicePluginImpl {
     fn create_input_devices(&self) {
-        let mut devices = evdev::enumerate().collect::<Vec<_>>();
-        for (index, device) in devices.iter().enumerate() {
+        let devices = evdev::enumerate().collect::<Vec<_>>();
+        for device in devices.iter() {
             debug!(
                 "Detected input device: {}",
                 device.name().unwrap_or("Unnamed Device")
             );
-            self.create_input_device(index, device);
+            self.create_input_device(device);
         }
     }
 
-    fn create_input_device(&self, index: usize, device: &Device) {
+    fn create_input_device(&self, device: &Device) {
         let device_name = device.name().unwrap_or("Unnamed Device");
         let physical_path = device.physical_path().unwrap_or("");
         let unique_name = format!("{}-{}", device_name, physical_path);
@@ -111,8 +112,8 @@ impl InputDevicePluginImpl {
                     reactive_entity_instance.id
                 );
                 self.create_input_device_keys(device, reactive_entity_instance.clone());
-                // TODO: create_device_mouse
-                // TODO: create_device_leds
+                self.create_input_device_mouse(device, reactive_entity_instance.clone());
+                self.create_input_device_leds(device, reactive_entity_instance.clone());
                 // TODO: create_device_switches
             }
             Err(_) => {
@@ -123,6 +124,7 @@ impl InputDevicePluginImpl {
             }
         }
     }
+
     fn create_input_device_keys(
         &self,
         device: &Device,
@@ -138,6 +140,7 @@ impl InputDevicePluginImpl {
             None => {}
         }
     }
+
     fn create_input_device_key(
         &self,
         device: &Device,
@@ -173,17 +176,6 @@ impl InputDevicePluginImpl {
                     unique_name,
                     input_device_key.id
                 );
-                let reader = input_device_key
-                    .properties
-                    .get(InputDeviceKeyProperties::KEYDOWN.as_ref())
-                    .unwrap()
-                    .stream
-                    .read()
-                    .unwrap();
-                // let unique_name = unique_name.clone();
-                // reader.observe(move |v| {
-                //     debug!("Input Device Key {}: {}", unique_name, v);
-                // });
                 self.create_key_event(
                     input_device_entity_instance.clone(),
                     input_device_key.clone(),
@@ -203,10 +195,6 @@ impl InputDevicePluginImpl {
         input_device: Arc<ReactiveEntityInstance>,
         input_device_key: Arc<ReactiveEntityInstance>,
     ) {
-        // let type_name = format!(
-        //     "{}--{}--{}",
-        //     KEY_EVENT, input_device.id, input_device_key.id
-        // );
         let key_event =
             RelationInstanceBuilder::new(input_device.id, KEY_EVENT, input_device_key.id).get();
         let reader = self.context.0.read().unwrap();
@@ -216,20 +204,96 @@ impl InputDevicePluginImpl {
             .get_relation_instance_manager()
             .clone();
         let _key_event = relation_instance_manager.create(key_event);
-        // match key_event {
-        //     Ok(key_event) => {
-        //         self.create_key_event(
-        //             input_device_entity_instance.clone(),
-        //             input_device_key.clone(),
-        //         );
-        //     }
-        //     Err(_) => {
-        //         error!(
-        //             "Failed to create entity instance for input device key {}!",
-        //             unique_name
-        //         );
-        //     }
-        // }
+    }
+
+    fn create_input_device_mouse(
+        &self,
+        device: &Device,
+        entity_instance: Arc<ReactiveEntityInstance>,
+    ) {
+        let supported_relative_axes = device.supported_relative_axes();
+        // usually mice
+    }
+
+    fn create_input_device_leds(
+        &self,
+        device: &Device,
+        entity_instance: Arc<ReactiveEntityInstance>,
+    ) {
+        let supported_leds = device.supported_leds();
+        match supported_leds {
+            Some(supported_leds) => {
+                for led in supported_leds.iter() {
+                    self.create_input_device_led(device, entity_instance.clone(), led);
+                }
+            }
+            None => {}
+        }
+    }
+
+    fn create_input_device_led(
+        &self,
+        device: &Device,
+        input_device_entity_instance: Arc<ReactiveEntityInstance>,
+        led: LedType,
+    ) {
+        let device_name = device.name().unwrap_or("Unnamed Device");
+        let physical_path = device.physical_path().unwrap_or("");
+        let led_name = format!("{:?}", led);
+        let unique_name = format!("{}-{}-{}", device_name, physical_path, led_name);
+        let reader = self.context.0.read().unwrap();
+        let input_device_led = EntityInstanceBuilder::new(INPUT_DEVICE_LED)
+            .id(Uuid::new_v5(
+                &NAMESPACE_INPUT_DEVICE,
+                unique_name.as_bytes(),
+            ))
+            .property("name", json!(unique_name))
+            .property("led", json!(led_name))
+            .property("ledtype", json!(led.0))
+            .property("state", json!(false))
+            .get();
+        let entity_instance_manager = reader
+            .as_ref()
+            .unwrap()
+            .get_entity_instance_manager()
+            .clone();
+        let input_device_led = entity_instance_manager.create(input_device_led);
+        match input_device_led {
+            Ok(input_device_led) => {
+                trace!(
+                    "Registered {} {} as {}",
+                    INPUT_DEVICE_KEY,
+                    unique_name,
+                    input_device_led.id
+                );
+                self.create_led_event(
+                    input_device_entity_instance.clone(),
+                    input_device_led.clone(),
+                );
+            }
+            Err(_) => {
+                error!(
+                    "Failed to create entity instance for input device LED {}!",
+                    unique_name
+                );
+            }
+        }
+    }
+
+    fn create_led_event(
+        &self,
+        input_device: Arc<ReactiveEntityInstance>,
+        input_device_led: Arc<ReactiveEntityInstance>,
+    ) {
+        let led_event =
+            RelationInstanceBuilder::new(input_device.id, LED_EVENT, input_device_led.id).get();
+        let reader = self.context.0.read().unwrap();
+        let relation_instance_manager = reader
+            .as_ref()
+            .unwrap()
+            .get_relation_instance_manager()
+            .clone();
+        let _led_event = relation_instance_manager.create(led_event);
     }
 }
 

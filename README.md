@@ -77,17 +77,16 @@ This plugin provides entity types which allows using raw input from keyboards.
 
 ### TODO
 
-1. InputDeviceKey
+- [x] Handle LEDs
+- [ ] InputDeviceKey
    1. Add property keyhold (value == 2)
-3. Different modes
+- [ ] Different modes
    1. Autodetect (current behaviour, slows down the initialization)
    2. Flow with keymap (the flow contains a keymap which defines which key shall be created)
    3. TOML config file with input devices and which keys shall be created)
-4. Handle LEDs
-   1. Entity Type InputDeviceLED (on/off)
-5. Mouse input
+- [ ] Mouse input
    1. Entity Type InputDeviceMouse (x, y, lbtn, rbtn, mbtn, wheel, ...)
-6. Virtual Keyboard
+- [ ] Virtual Keyboard
    1. Create a virtual device (useful for embedded devices without a keyboard)
    2. Send key events via the virtual device
 
