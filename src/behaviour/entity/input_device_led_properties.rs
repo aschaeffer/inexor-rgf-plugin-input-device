@@ -6,8 +6,8 @@ use strum_macros::{AsRefStr, IntoStaticStr, ToString};
 #[allow(non_camel_case_types)]
 #[derive(AsRefStr, IntoStaticStr, ToString)]
 pub enum InputDeviceLedProperties {
-    #[strum(serialize = "ledtype")]
-    LEDTYPE,
+    #[strum(serialize = "led_type")]
+    LED_TYPE,
     #[strum(serialize = "state")]
     STATE,
 }
@@ -15,13 +15,13 @@ pub enum InputDeviceLedProperties {
 impl InputDeviceLedProperties {
     pub fn default_value(&self) -> Value {
         match self {
-            InputDeviceLedProperties::LEDTYPE => json!(-1),
+            InputDeviceLedProperties::LED_TYPE => json!(-1),
             InputDeviceLedProperties::STATE => json!(false),
         }
     }
     pub fn properties() -> NamedProperties {
         vec![
-            NamedProperty::from(InputDeviceLedProperties::LEDTYPE),
+            NamedProperty::from(InputDeviceLedProperties::LED_TYPE),
             NamedProperty::from(InputDeviceLedProperties::STATE),
         ]
     }

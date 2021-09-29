@@ -7,7 +7,7 @@ use serde_json::json;
 use crate::behaviour::entity::input_device_led_properties::InputDeviceLedProperties;
 use crate::behaviour::entity::input_device_properties::InputDeviceProperties;
 use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_VALUE, LED_EVENT_LEDTYPE,
+    INPUT_EVENT_KIND, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_VALUE, LED_EVENT_LED_TYPE,
 };
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveRelationInstance;
@@ -27,11 +27,11 @@ impl LedEvent {
     pub fn new<'a>(r: Arc<ReactiveRelationInstance>) -> Result<LedEvent, BehaviourCreationError> {
         let input_device = r.outbound.clone();
         let input_device_led = r.inbound.clone();
-        let input_device_led_ledtype = input_device_led.as_i64(InputDeviceLedProperties::LEDTYPE);
-        if input_device_led_ledtype.is_none() {
+        let input_device_led_led_type = input_device_led.as_i64(InputDeviceLedProperties::LED_TYPE);
+        if input_device_led_led_type.is_none() {
             return Err(BehaviourCreationError.into());
         }
-        let input_device_led_ledtype = input_device_led_ledtype.unwrap();
+        let input_device_led_led_type = input_device_led_led_type.unwrap();
 
         let handle_id = input_device
             .properties
@@ -61,9 +61,12 @@ impl LedEvent {
 
                     match input_event_kind.unwrap().as_str().unwrap() {
                         INPUT_EVENT_KIND_LED_EVENT => {
-                            let event_ledtype =
-                                event.get(LED_EVENT_LEDTYPE).unwrap().as_i64().unwrap_or(-1);
-                            if input_device_led_ledtype == event_ledtype {
+                            let event_led_type = event
+                                .get(LED_EVENT_LED_TYPE)
+                                .unwrap()
+                                .as_i64()
+                                .unwrap_or(-1);
+                            if input_device_led_led_type == event_led_type {
                                 let old_value = input_device_led
                                     .get(InputDeviceLedProperties::STATE)
                                     .unwrap()

@@ -1,0 +1,16 @@
+query scroll_wheel {
+  instances {
+    scroll_wheel: entities(id: "cad9c879-2b79-59f0-a0a4-6fa50818cf06") {
+      id,
+      type {name},
+      properties(
+        names: [
+          "name",
+          "relative_axis",
+          "relative_axis_type",
+          "state"
+        ]
+      )
+    }
+  }
+}

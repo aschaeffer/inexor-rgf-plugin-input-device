@@ -1,7 +1,7 @@
 {
-  "name": "input_device_key",
+  "name": "input_device_relative_axis",
   "group": "hardware",
-  "description": "Input Device Key",
+  "description": "Input Device Relative Axis",
   "components": [
     "named",
     "flow_2d",
@@ -9,18 +9,18 @@
   ],
   "properties": [
     {
-      "name": "key",
+      "name": "relative_axis",
       "data_type": "string",
       "socket_type": "none"
     },
     {
-      "name": "key_code",
+      "name": "relative_axis_type",
       "data_type": "number",
       "socket_type": "none"
     },
     {
-      "name": "key_down",
-      "data_type": "bool",
+      "name": "state",
+      "data_type": "number",
       "socket_type": "output"
     }
   ],
@@ -28,7 +28,7 @@
     {
       "name": "palette",
       "extension": {
-        "content": "Input Device Key",
+        "content": "Input Device Relative Axis",
         "styles":  {
           "font-size": "12px",
           "font-family": "Fira Code",
@@ -68,7 +68,7 @@
           "symbol": {
             "show": true,
             "type": "text",
-            "content": "Input Device Key",
+            "content": "Input Device Relative Axis",
             "position": {
               "left": 0,
               "top": 0,
@@ -102,8 +102,8 @@
     {
       "name": "dublin-core",
       "extension":{
-        "title": "Input Device Key",
-        "subject": "Input Device Key",
+        "title": "Input Device Relative Axis",
+        "subject": "Input Device Relative Axis",
         "creator": "Hanack"
       }
     }

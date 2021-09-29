@@ -7,7 +7,7 @@ use serde_json::json;
 use crate::behaviour::entity::input_device_key_properties::InputDeviceKeyProperties;
 use crate::behaviour::entity::input_device_properties::InputDeviceProperties;
 use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEYCODE,
+    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEY_CODE,
 };
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveRelationInstance;
@@ -27,11 +27,11 @@ impl KeyEvent {
     pub fn new<'a>(r: Arc<ReactiveRelationInstance>) -> Result<KeyEvent, BehaviourCreationError> {
         let input_device = r.outbound.clone();
         let input_device_key = r.inbound.clone();
-        let input_device_key_keycode = input_device_key.as_i64(InputDeviceKeyProperties::KEYCODE);
-        if input_device_key_keycode.is_none() {
+        let input_device_key_key_code = input_device_key.as_i64(InputDeviceKeyProperties::KEY_CODE);
+        if input_device_key_key_code.is_none() {
             return Err(BehaviourCreationError.into());
         }
-        let input_device_key_keycode = input_device_key_keycode.unwrap();
+        let input_device_key_key_code = input_device_key_key_code.unwrap();
 
         let handle_id = input_device
             .properties
@@ -61,12 +61,14 @@ impl KeyEvent {
 
                     match input_event_kind.unwrap().as_str().unwrap() {
                         INPUT_EVENT_KIND_KEY_EVENT => {
-                            let event_keycode =
-                                event.get(KEY_EVENT_KEYCODE).unwrap().as_i64().unwrap_or(-1);
-                            if input_device_key_keycode == event_keycode {
-                                // debug!("event_keycode {}", event_keycode);
+                            let event_key_code = event
+                                .get(KEY_EVENT_KEY_CODE)
+                                .unwrap()
+                                .as_i64()
+                                .unwrap_or(-1);
+                            if input_device_key_key_code == event_key_code {
                                 let old_value = input_device_key
-                                    .get(InputDeviceKeyProperties::KEYDOWN)
+                                    .get(InputDeviceKeyProperties::KEY_DOWN)
                                     .unwrap()
                                     .as_bool()
                                     .unwrap();
@@ -81,7 +83,7 @@ impl KeyEvent {
                                     0 => {
                                         if old_value {
                                             input_device_key.set(
-                                                InputDeviceKeyProperties::KEYDOWN.to_string(),
+                                                InputDeviceKeyProperties::KEY_DOWN.to_string(),
                                                 json!(false),
                                             )
                                         }
@@ -90,7 +92,7 @@ impl KeyEvent {
                                     1 => {
                                         if !old_value {
                                             input_device_key.set(
-                                                InputDeviceKeyProperties::KEYDOWN.to_string(),
+                                                InputDeviceKeyProperties::KEY_DOWN.to_string(),
                                                 json!(true),
                                             );
                                         }
@@ -99,7 +101,7 @@ impl KeyEvent {
                                     2 => {
                                         if !old_value {
                                             input_device_key.set(
-                                                InputDeviceKeyProperties::KEYDOWN.to_string(),
+                                                InputDeviceKeyProperties::KEY_DOWN.to_string(),
                                                 json!(true),
                                             )
                                         }

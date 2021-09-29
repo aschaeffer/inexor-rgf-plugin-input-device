@@ -1,0 +1,10 @@
+{
+  "name": "relative_axis_event",
+  "description": "Relative Axis Event of an input device",
+  "outbound_type": "input_device",
+  "inbound_type": "input_device_relative_axis",
+  "components": [
+  ],
+  "properties": [
+  ]
+}

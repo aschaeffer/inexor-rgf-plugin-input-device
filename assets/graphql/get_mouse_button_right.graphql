@@ -1,7 +1,8 @@
-query keys {
+query mouse_button_right {
   instances {
-    keys: entities(entityType: "input_device_key") {
-      id
+    mouse_button_right: entities(id: "41b0c1b3-1d6c-5f91-b2b6-cd1aac1c9e16") {
+      id,
+      type {name},
       properties(
         names: [
           "name",

@@ -14,7 +14,7 @@
       "socket_type": "none"
     },
     {
-      "name": "ledtype",
+      "name": "led_type",
       "data_type": "number",
       "socket_type": "none"
     },

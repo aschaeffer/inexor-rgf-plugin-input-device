@@ -1,0 +1,15 @@
+query relative_axes {
+  instances {
+    relative_axes: entities(entityType: "input_device_relative_axis") {
+      id
+      properties(
+        names: [
+          "name",
+          "relative_axis",
+          "relative_axis_type",
+          "state"
+        ]
+      )
+    }
+  }
+}

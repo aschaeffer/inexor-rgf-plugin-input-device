@@ -5,6 +5,7 @@ use log::{debug, error, trace};
 use waiter_di::*;
 
 use crate::behaviour::entity::entity_behaviour_provider::InputDeviceEntityBehaviourProviderImpl;
+use crate::behaviour::entity::InputDeviceRelativeAxisProperties;
 use crate::behaviour::relation::relation_behaviour_provider::InputDeviceRelationBehaviourProviderImpl;
 use crate::builder::{EntityInstanceBuilder, RelationInstanceBuilder};
 use crate::model::ReactiveEntityInstance;
@@ -19,7 +20,7 @@ use crate::provider::{
     InputDeviceEntityTypeProviderImpl, InputDeviceFlowProviderImpl,
     InputDeviceRelationTypeProviderImpl,
 };
-use evdev::{Device, Key, LedType};
+use evdev::{Device, Key, LedType, RelativeAxisType};
 use serde_json::json;
 use std::env;
 use uuid::Uuid;
@@ -32,9 +33,13 @@ const INPUT_DEVICE_KEY: &'static str = "input_device_key";
 
 const INPUT_DEVICE_LED: &'static str = "input_device_led";
 
+const INPUT_DEVICE_RELATIVE_AXIS: &'static str = "input_device_relative_axis";
+
 const KEY_EVENT: &'static str = "key_event";
 
 const LED_EVENT: &'static str = "led_event";
+
+const RELATIVE_AXIS_EVENT: &'static str = "relative_axis_event";
 
 #[wrapper]
 pub struct PluginContextContainer(RwLock<Option<std::sync::Arc<dyn PluginContext>>>);
@@ -112,8 +117,8 @@ impl InputDevicePluginImpl {
                     reactive_entity_instance.id
                 );
                 self.create_input_device_keys(device, reactive_entity_instance.clone());
-                self.create_input_device_mouse(device, reactive_entity_instance.clone());
                 self.create_input_device_leds(device, reactive_entity_instance.clone());
+                self.create_input_device_relative_axes(device, reactive_entity_instance.clone());
                 // TODO: create_device_switches
             }
             Err(_) => {
@@ -159,8 +164,8 @@ impl InputDevicePluginImpl {
             ))
             .property("name", json!(unique_name))
             .property("key", json!(key_name))
-            .property("keycode", json!(key.code()))
-            .property("keydown", json!(false))
+            .property("key_code", json!(key.code()))
+            .property("key_down", json!(false))
             .get();
         let entity_instance_manager = reader
             .as_ref()
@@ -206,15 +211,6 @@ impl InputDevicePluginImpl {
         let _key_event = relation_instance_manager.create(key_event);
     }
 
-    fn create_input_device_mouse(
-        &self,
-        device: &Device,
-        entity_instance: Arc<ReactiveEntityInstance>,
-    ) {
-        let supported_relative_axes = device.supported_relative_axes();
-        // usually mice
-    }
-
     fn create_input_device_leds(
         &self,
         device: &Device,
@@ -249,7 +245,7 @@ impl InputDevicePluginImpl {
             ))
             .property("name", json!(unique_name))
             .property("led", json!(led_name))
-            .property("ledtype", json!(led.0))
+            .property("led_type", json!(led.0))
             .property("state", json!(false))
             .get();
         let entity_instance_manager = reader
@@ -294,6 +290,101 @@ impl InputDevicePluginImpl {
             .get_relation_instance_manager()
             .clone();
         let _led_event = relation_instance_manager.create(led_event);
+    }
+
+    fn create_input_device_relative_axes(
+        &self,
+        device: &Device,
+        entity_instance: Arc<ReactiveEntityInstance>,
+    ) {
+        let supported_relative_axes = device.supported_relative_axes();
+        match supported_relative_axes {
+            Some(supported_relative_axes) => {
+                for relative_axis in supported_relative_axes.iter() {
+                    self.create_input_device_relative_axis(
+                        device,
+                        entity_instance.clone(),
+                        relative_axis,
+                    );
+                }
+            }
+            None => {}
+        }
+    }
+
+    fn create_input_device_relative_axis(
+        &self,
+        device: &Device,
+        input_device_entity_instance: Arc<ReactiveEntityInstance>,
+        relative_axis: RelativeAxisType,
+    ) {
+        let device_name = device.name().unwrap_or("Unnamed Device");
+        let physical_path = device.physical_path().unwrap_or("");
+        let relative_axis_name = format!("{:?}", relative_axis);
+        let unique_name = format!("{}-{}-{}", device_name, physical_path, relative_axis_name);
+        let reader = self.context.0.read().unwrap();
+        let input_device_relative_axis = EntityInstanceBuilder::new(INPUT_DEVICE_RELATIVE_AXIS)
+            .id(Uuid::new_v5(
+                &NAMESPACE_INPUT_DEVICE,
+                unique_name.as_bytes(),
+            ))
+            .property("name", json!(unique_name))
+            .property("relative_axis", json!(relative_axis_name))
+            .property(
+                InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE.as_ref(),
+                json!(relative_axis.0),
+            )
+            .property(
+                InputDeviceRelativeAxisProperties::STATE.as_ref(),
+                InputDeviceRelativeAxisProperties::STATE.default_value(),
+            )
+            .get();
+        let entity_instance_manager = reader
+            .as_ref()
+            .unwrap()
+            .get_entity_instance_manager()
+            .clone();
+        let input_device_relative_axis = entity_instance_manager.create(input_device_relative_axis);
+        match input_device_relative_axis {
+            Ok(input_device_relative_axis) => {
+                trace!(
+                    "Registered {} {} as {}",
+                    INPUT_DEVICE_RELATIVE_AXIS,
+                    unique_name,
+                    input_device_relative_axis.id
+                );
+                self.create_relative_axis_event(
+                    input_device_entity_instance.clone(),
+                    input_device_relative_axis.clone(),
+                );
+            }
+            Err(_) => {
+                error!(
+                    "Failed to create entity instance for input device relative axis {}!",
+                    unique_name
+                );
+            }
+        }
+    }
+
+    fn create_relative_axis_event(
+        &self,
+        input_device: Arc<ReactiveEntityInstance>,
+        input_device_relative_axis: Arc<ReactiveEntityInstance>,
+    ) {
+        let relative_axis_event = RelationInstanceBuilder::new(
+            input_device.id,
+            RELATIVE_AXIS_EVENT,
+            input_device_relative_axis.id,
+        )
+        .get();
+        let reader = self.context.0.read().unwrap();
+        let relation_instance_manager = reader
+            .as_ref()
+            .unwrap()
+            .get_relation_instance_manager()
+            .clone();
+        let _relative_axis_event = relation_instance_manager.create(relative_axis_event);
     }
 }
 

@@ -30,7 +30,9 @@ The Inexor Reactive Graph Flow (RGF) manages reactive flows based on a graph dat
 
 ### About this plugin
 
-This plugin provides entity types which allows using raw input from keyboards.
+This plugin enables input device event handling. It receives events from the evdev system
+on linux and supports keys (keyboards, mouse buttons), relative axes (mouse x,y, scroll wheel),
+absolute axes (joystick, touchpad), leds (numlock) and switches (power buttons).
 
 [<img src="https://img.shields.io/badge/Language-Rust-brightgreen">](https://www.rust-lang.org/)
 [<img src="https://img.shields.io/badge/Platforms-Linux%20%26%20Windows-brightgreen">]()
@@ -54,14 +56,22 @@ This plugin provides entity types which allows using raw input from keyboards.
 | | product | number | output |
 | | version | number | output |
 | InputDeviceKey | key | string | none |
-| | keycode | number | none |
-| | keydown | bool | output |
+| | key_code | number | none |
+| | key_down | bool | output |
+| InputDeviceLed | led | string | none |
+| | led_type | number | none |
+| | state | bool | output |
+| InputDeviceRelativeAxis | relative_axis | string | none |
+| | relative_axis_type | number | none |
+| | state | number | output |
 
 #### Relation Types
 
 | Name | Outbound Entity Type | Inbound Entity Type |
 | --- | --- | --- |
 | KeyEvent | InputDevice | InputDeviceKey |
+| LedEvent | InputDevice | InputDeviceLed |
+| RelativeAxisEvent | InputDevice | InputDeviceRelativeAxis |
 
 #### Entity Behaviours
 
@@ -73,22 +83,25 @@ This plugin provides entity types which allows using raw input from keyboards.
 
 | Name | Description |
 | --- | --- |
-| KeyEvent | Propagate input events and filters by event type (key event) and keycode defined by the inbound entity instance |
+| KeyEvent | Propagate input events and filters by event type (key event) and key code defined by the inbound entity instance |
+| LedEvent | Propagate input events and filters by event type (led event) and led type defined by the inbound entity instance |
+| RelativeAxisEvent | Propagate input events and filters by event type (relative axis event) and relative axis type defined by the inbound entity instance |
 
 ### TODO
 
-- [x] Handle LEDs
-- [ ] InputDeviceKey
-   1. Add property keyhold (value == 2)
-- [ ] Different modes
-   1. Autodetect (current behaviour, slows down the initialization)
-   2. Flow with keymap (the flow contains a keymap which defines which key shall be created)
-   3. TOML config file with input devices and which keys shall be created)
-- [ ] Mouse input
-   1. Entity Type InputDeviceMouse (x, y, lbtn, rbtn, mbtn, wheel, ...)
+- [x] InputDeviceLed
+- [x] InputDeviceRelativeAxis (Mouse X, Mouse Y, Scroll Wheel)
+- [ ] Input Device Configuration
+  - [ ] Autodetect Input Devices
+  - [ ] Configure Device
+    - [ ] By Name
+    - [ ] By Type
+    - [ ] Keys
+    - [ ] RelAxes
+    - [ ] Leds
 - [ ] Virtual Keyboard
-   1. Create a virtual device (useful for embedded devices without a keyboard)
-   2. Send key events via the virtual device
+  - [ ] Create a virtual device (useful for embedded devices without a keyboard)
+  - [ ] Send key events via the virtual device
 
 ### Thanks to
 

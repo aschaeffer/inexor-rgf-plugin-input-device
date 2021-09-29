@@ -9,8 +9,9 @@ use serde_json::json;
 
 use crate::behaviour::entity::InputDeviceProperties;
 use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_VALUE,
-    KEY_EVENT_KEYCODE, LED_EVENT_LEDTYPE,
+    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_KIND_LED_EVENT,
+    INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEY_CODE,
+    LED_EVENT_LED_TYPE, RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE,
 };
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveEntityInstance;
@@ -95,14 +96,21 @@ impl DeviceInput {
                                     InputEventKind::Key(key) => {
                                         property_event.set(json!({
                                             INPUT_EVENT_KIND: INPUT_EVENT_KIND_KEY_EVENT,
-                                            KEY_EVENT_KEYCODE: key.code(),
+                                            KEY_EVENT_KEY_CODE: key.code(),
                                             INPUT_EVENT_VALUE: event.value()
                                         }))
                                     }
                                     InputEventKind::Led(led_type) => {
                                         property_event.set(json!({
                                             INPUT_EVENT_KIND: INPUT_EVENT_KIND_LED_EVENT,
-                                            LED_EVENT_LEDTYPE: led_type.0,
+                                            LED_EVENT_LED_TYPE: led_type.0,
+                                            INPUT_EVENT_VALUE: event.value()
+                                        }))
+                                    }
+                                    InputEventKind::RelAxis(relative_axis_type) => {
+                                        property_event.set(json!({
+                                            INPUT_EVENT_KIND: INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT,
+                                            RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE: relative_axis_type.0,
                                             INPUT_EVENT_VALUE: event.value()
                                         }))
                                     }
