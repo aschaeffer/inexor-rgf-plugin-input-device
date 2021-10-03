@@ -15,7 +15,7 @@ use crate::reactive::entity::Disconnectable;
 use inexor_rgf_core_model::PropertyInstanceSetter;
 use inexor_rgf_core_reactive::BehaviourCreationError;
 
-const KEY_EVENT: &'static str = "key_event";
+pub const KEY_EVENT: &'static str = "key_event";
 
 pub struct KeyEvent {
     pub relation: Arc<ReactiveRelationInstance>,

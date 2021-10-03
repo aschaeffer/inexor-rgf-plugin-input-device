@@ -1,7 +1,7 @@
 {
   "name": "input_device_relative_axis",
   "group": "hardware",
-  "description": "Input Device Relative Axis",
+  "description": "A relative axis of an input device",
   "components": [
     "named",
     "flow_2d",
@@ -103,7 +103,7 @@
       "name": "dublin-core",
       "extension":{
         "title": "Input Device Relative Axis",
-        "subject": "Input Device Relative Axis",
+        "subject": "A relative axis of an input device",
         "creator": "Hanack"
       }
     }

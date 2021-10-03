@@ -1,0 +1,15 @@
+query absolute_axes {
+  instances {
+    absolute_axes: entities(entityType: "input_device_absolute_axis") {
+      id
+      properties(
+        names: [
+          "name",
+          "absolute_axis",
+          "absolute_axis_type",
+          "state"
+        ]
+      )
+    }
+  }
+}

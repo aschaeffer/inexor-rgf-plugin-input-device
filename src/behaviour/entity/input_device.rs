@@ -21,6 +21,8 @@ use futures::FutureExt;
 use futures::{select, StreamExt};
 use futures_timer::Delay;
 
+pub const INPUT_DEVICE: &'static str = "input_device";
+
 pub struct DeviceInput {
     pub entity: Arc<ReactiveEntityInstance>,
 

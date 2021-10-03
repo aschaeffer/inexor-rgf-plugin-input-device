@@ -1,0 +1,24 @@
+# If true the input devices are detected automatically
+autodetect = false
+
+# The following input devices will be ignored if autodetection is enabled
+
+[[input_device]]
+name = "HP Pavilion Gaming Mouse 300"
+active = true
+path = "/dev/input/by-id/usb-HP_HP_Pavilion_Gaming_Mouse_300-event-mouse"
+
+[[input_device]]
+name = "Razer BlackWidow Ultimate Keyboard"
+active = true
+path = "/dev/input/by-id/usb-Razer_Razer_BlackWidow_Ultimate-if01-event-kbd"
+
+[[input_device]]
+name = "Razer BlackWidow Ultimate LEDs"
+active = true
+path = "/dev/input/by-id/usb-Razer_Razer_BlackWidow_Ultimate-event-kbd"
+
+[[input_device]]
+name = "LogiLink Keypad"
+active = true
+path = "/dev/input/by-id/usb-MOSART_Semi._2.4G_Keyboard_Mouse-event-kbd"

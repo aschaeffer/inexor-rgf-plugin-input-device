@@ -5,9 +5,10 @@ use indradb::EdgeKey;
 use log::trace;
 use waiter_di::*;
 
-use crate::behaviour::relation::key_event::KeyEvent;
-use crate::behaviour::relation::led_event::LedEvent;
-use crate::behaviour::relation::relative_axis_event::RelativeAxisEvent;
+use crate::behaviour::relation::{
+    absolute_axis_event::AbsoluteAxisEvent, key_event::KeyEvent, led_event::LedEvent,
+    relative_axis_event::RelativeAxisEvent,
+};
 use crate::model::ReactiveRelationInstance;
 use crate::plugins::RelationBehaviourProvider;
 
@@ -16,6 +17,8 @@ const KEY_EVENT: &'static str = "key_event";
 const LED_EVENT: &'static str = "led_event";
 
 const RELATIVE_AXIS_EVENT: &'static str = "relative_axis_event";
+
+const ABSOLUTE_AXIS_EVENT: &'static str = "absolute_axis_event";
 
 #[wrapper]
 pub struct KeyEventRelationBehaviourStorage(
@@ -32,6 +35,11 @@ pub struct RelativeAxisEventRelationBehaviourStorage(
     std::sync::RwLock<std::collections::HashMap<EdgeKey, std::sync::Arc<RelativeAxisEvent>>>,
 );
 
+#[wrapper]
+pub struct AbsoluteAxisEventRelationBehaviourStorage(
+    std::sync::RwLock<std::collections::HashMap<EdgeKey, std::sync::Arc<AbsoluteAxisEvent>>>,
+);
+
 #[waiter_di::provides]
 fn create_key_event_relation_behaviour_storage() -> KeyEventRelationBehaviourStorage {
     KeyEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
@@ -46,6 +54,14 @@ fn create_led_event_relation_behaviour_storage() -> LedEventRelationBehaviourSto
 fn create_relative_axis_event_relation_behaviour_storage(
 ) -> RelativeAxisEventRelationBehaviourStorage {
     RelativeAxisEventRelationBehaviourStorage(std::sync::RwLock::new(
+        std::collections::HashMap::new(),
+    ))
+}
+
+#[waiter_di::provides]
+fn create_absolute_axis_event_relation_behaviour_storage(
+) -> AbsoluteAxisEventRelationBehaviourStorage {
+    AbsoluteAxisEventRelationBehaviourStorage(std::sync::RwLock::new(
         std::collections::HashMap::new(),
     ))
 }
@@ -70,6 +86,16 @@ pub trait InputDeviceRelationBehaviourProvider: RelationBehaviourProvider + Send
         relation_instance: Arc<ReactiveRelationInstance>,
     );
 
+    fn create_absolute_axis_event_behaviour(
+        &self,
+        relation_instance: Arc<ReactiveRelationInstance>,
+    );
+
+    fn remove_absolute_axis_event_behaviour(
+        &self,
+        relation_instance: Arc<ReactiveRelationInstance>,
+    );
+
     fn remove_by_key(&self, edge_key: EdgeKey);
 }
 
@@ -78,6 +104,7 @@ pub struct InputDeviceRelationBehaviourProviderImpl {
     key_event_relation_behaviours: KeyEventRelationBehaviourStorage,
     led_event_relation_behaviours: LedEventRelationBehaviourStorage,
     relative_axis_event_relation_behaviours: RelativeAxisEventRelationBehaviourStorage,
+    absolute_axis_event_relation_behaviours: AbsoluteAxisEventRelationBehaviourStorage,
 }
 
 interfaces!(InputDeviceRelationBehaviourProviderImpl: dyn RelationBehaviourProvider);
@@ -91,6 +118,8 @@ impl InputDeviceRelationBehaviourProviderImpl {
             led_event_relation_behaviours: create_led_event_relation_behaviour_storage(),
             relative_axis_event_relation_behaviours:
                 create_relative_axis_event_relation_behaviour_storage(),
+            absolute_axis_event_relation_behaviours:
+                create_absolute_axis_event_relation_behaviour_storage(),
         }
     }
 }
@@ -221,6 +250,51 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         );
     }
 
+    fn create_absolute_axis_event_behaviour(
+        &self,
+        relation_instance: Arc<ReactiveRelationInstance>,
+    ) {
+        let edge_key = relation_instance.get_key();
+        if edge_key.is_none() {
+            return;
+        }
+        let edge_key = edge_key.unwrap();
+        let absolute_axis_event = AbsoluteAxisEvent::new(relation_instance);
+        if absolute_axis_event.is_ok() {
+            self.absolute_axis_event_relation_behaviours
+                .0
+                .write()
+                .unwrap()
+                .insert(edge_key.clone(), Arc::new(absolute_axis_event.unwrap()));
+            trace!(
+                "Added relation behaviour {} to relation instance {:?}",
+                ABSOLUTE_AXIS_EVENT,
+                edge_key
+            );
+        }
+    }
+
+    fn remove_absolute_axis_event_behaviour(
+        &self,
+        relation_instance: Arc<ReactiveRelationInstance>,
+    ) {
+        let edge_key = relation_instance.get_key();
+        if edge_key.is_none() {
+            return;
+        }
+        let edge_key = edge_key.unwrap();
+        self.absolute_axis_event_relation_behaviours
+            .0
+            .write()
+            .unwrap()
+            .remove(&edge_key);
+        trace!(
+            "Removed behaviour {} from relation instance {:?}",
+            ABSOLUTE_AXIS_EVENT,
+            edge_key
+        );
+    }
+
     fn remove_by_key(&self, edge_key: EdgeKey) {
         if self
             .key_event_relation_behaviours
@@ -276,6 +350,24 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
                 edge_key
             );
         }
+        if self
+            .absolute_axis_event_relation_behaviours
+            .0
+            .write()
+            .unwrap()
+            .contains_key(&edge_key)
+        {
+            self.absolute_axis_event_relation_behaviours
+                .0
+                .write()
+                .unwrap()
+                .remove(&edge_key);
+            trace!(
+                "Removed behaviour {} from relation instance {:?}",
+                ABSOLUTE_AXIS_EVENT,
+                edge_key
+            );
+        }
     }
 }
 
@@ -285,6 +377,7 @@ impl RelationBehaviourProvider for InputDeviceRelationBehaviourProviderImpl {
             KEY_EVENT => self.create_key_event_behaviour(relation_instance),
             LED_EVENT => self.create_led_event_behaviour(relation_instance),
             RELATIVE_AXIS_EVENT => self.create_relative_axis_event_behaviour(relation_instance),
+            ABSOLUTE_AXIS_EVENT => self.create_absolute_axis_event_behaviour(relation_instance),
             _ => {}
         }
     }
@@ -294,6 +387,7 @@ impl RelationBehaviourProvider for InputDeviceRelationBehaviourProviderImpl {
             KEY_EVENT => self.remove_key_event_behaviour(relation_instance),
             LED_EVENT => self.remove_led_event_behaviour(relation_instance),
             RELATIVE_AXIS_EVENT => self.remove_relative_axis_event_behaviour(relation_instance),
+            ABSOLUTE_AXIS_EVENT => self.remove_absolute_axis_event_behaviour(relation_instance),
             _ => {}
         }
     }

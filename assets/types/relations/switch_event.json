@@ -1,0 +1,10 @@
+{
+  "name": "switch_event",
+  "description": "An event corresponding to a physical or virtual switch.",
+  "outbound_type": "input_device",
+  "inbound_type": "input_device_switch",
+  "components": [
+  ],
+  "properties": [
+  ]
+}

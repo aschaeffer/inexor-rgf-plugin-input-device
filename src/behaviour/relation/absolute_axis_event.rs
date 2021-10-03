@@ -4,11 +4,11 @@ use std::sync::Arc;
 use log::debug;
 use serde_json::json;
 
+use crate::behaviour::entity::input_device_absolute_axis_properties::InputDeviceAbsoluteAxisProperties;
 use crate::behaviour::entity::input_device_properties::InputDeviceProperties;
-use crate::behaviour::entity::input_device_relative_axis_properties::InputDeviceRelativeAxisProperties;
 use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE,
-    RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE,
+    ABSOLUTE_AXIS_EVENT_ABSOLUTE_AXIS_TYPE, INPUT_EVENT_KIND, INPUT_EVENT_KIND_ABSOLUTE_AXIS_EVENT,
+    INPUT_EVENT_VALUE,
 };
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveRelationInstance;
@@ -16,27 +16,27 @@ use crate::reactive::entity::Disconnectable;
 use inexor_rgf_core_model::PropertyInstanceSetter;
 use inexor_rgf_core_reactive::BehaviourCreationError;
 
-pub const RELATIVE_AXIS_EVENT: &'static str = "relative_axis_event";
+pub const ABSOLUTE_AXIS_EVENT: &'static str = "absolute_axis_event";
 
-pub struct RelativeAxisEvent {
+pub struct AbsoluteAxisEvent {
     pub relation: Arc<ReactiveRelationInstance>,
 
     pub handle_id: u128,
 }
 
-impl RelativeAxisEvent {
+impl AbsoluteAxisEvent {
     pub fn new<'a>(
         r: Arc<ReactiveRelationInstance>,
-    ) -> Result<RelativeAxisEvent, BehaviourCreationError> {
+    ) -> Result<AbsoluteAxisEvent, BehaviourCreationError> {
         let input_device = r.outbound.clone();
-        let input_device_relative_axis = r.inbound.clone();
-        let input_device_relative_axis_relative_axis_type = input_device_relative_axis
-            .as_i64(InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE);
-        if input_device_relative_axis_relative_axis_type.is_none() {
+        let input_device_absolute_axis = r.inbound.clone();
+        let input_device_absolute_axis_absolute_axis_type = input_device_absolute_axis
+            .as_i64(InputDeviceAbsoluteAxisProperties::ABSOLUTE_AXIS_TYPE);
+        if input_device_absolute_axis_absolute_axis_type.is_none() {
             return Err(BehaviourCreationError.into());
         }
-        let input_device_relative_axis_relative_axis_type =
-            input_device_relative_axis_relative_axis_type.unwrap();
+        let input_device_absolute_axis_absolute_axis_type =
+            input_device_absolute_axis_absolute_axis_type.unwrap();
 
         let handle_id = input_device
             .properties
@@ -64,19 +64,19 @@ impl RelativeAxisEvent {
                     }
 
                     match input_event_kind.unwrap().as_str().unwrap() {
-                        INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT => {
-                            let event_relative_axis_type = event
-                                .get(RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE)
+                        INPUT_EVENT_KIND_ABSOLUTE_AXIS_EVENT => {
+                            let event_absolute_axis_type = event
+                                .get(ABSOLUTE_AXIS_EVENT_ABSOLUTE_AXIS_TYPE)
                                 .unwrap()
                                 .as_i64()
                                 .unwrap_or(-1);
-                            if input_device_relative_axis_relative_axis_type
-                                == event_relative_axis_type
+                            if input_device_absolute_axis_absolute_axis_type
+                                == event_absolute_axis_type
                             {
                                 let default = json!(0);
                                 let value = event.get(INPUT_EVENT_VALUE).unwrap_or(&default);
-                                input_device_relative_axis.set(
-                                    InputDeviceRelativeAxisProperties::STATE.to_string(),
+                                input_device_absolute_axis.set(
+                                    InputDeviceAbsoluteAxisProperties::STATE.to_string(),
                                     value.clone(),
                                 );
                             }
@@ -87,7 +87,7 @@ impl RelativeAxisEvent {
                 handle_id,
             );
 
-        Ok(RelativeAxisEvent {
+        Ok(AbsoluteAxisEvent {
             relation: r.clone(),
             handle_id,
         })
@@ -98,11 +98,11 @@ impl RelativeAxisEvent {
     }
 }
 
-impl Disconnectable for RelativeAxisEvent {
+impl Disconnectable for AbsoluteAxisEvent {
     fn disconnect(&self) {
         debug!(
             "Disconnecting behaviour {} from property instance {}",
-            RELATIVE_AXIS_EVENT, self.handle_id
+            ABSOLUTE_AXIS_EVENT, self.handle_id
         );
         let property = self
             .relation
@@ -121,7 +121,7 @@ impl Disconnectable for RelativeAxisEvent {
 }
 
 /// Automatically disconnect streams on destruction
-impl Drop for RelativeAxisEvent {
+impl Drop for AbsoluteAxisEvent {
     fn drop(&mut self) {
         self.disconnect();
     }

@@ -10,6 +10,14 @@ pub enum InputDeviceProperties {
     NAME,
     #[strum(serialize = "physical_path")]
     PHYSICAL_PATH,
+    #[strum(serialize = "driver_version")]
+    DRIVER_VERSION,
+    #[strum(serialize = "vendor")]
+    VENDOR,
+    #[strum(serialize = "product")]
+    PRODUCT,
+    #[strum(serialize = "version")]
+    VERSION,
     #[strum(serialize = "event")]
     EVENT,
 }
@@ -19,6 +27,10 @@ impl InputDeviceProperties {
         match self {
             InputDeviceProperties::NAME => json!(""),
             InputDeviceProperties::PHYSICAL_PATH => json!(""),
+            InputDeviceProperties::DRIVER_VERSION => json!("1.0.0"),
+            InputDeviceProperties::VENDOR => json!(0),
+            InputDeviceProperties::PRODUCT => json!(0),
+            InputDeviceProperties::VERSION => json!(0),
             InputDeviceProperties::EVENT => json!({}),
         }
     }
@@ -26,6 +38,10 @@ impl InputDeviceProperties {
         vec![
             NamedProperty::from(InputDeviceProperties::NAME),
             NamedProperty::from(InputDeviceProperties::PHYSICAL_PATH),
+            NamedProperty::from(InputDeviceProperties::DRIVER_VERSION),
+            NamedProperty::from(InputDeviceProperties::VENDOR),
+            NamedProperty::from(InputDeviceProperties::PRODUCT),
+            NamedProperty::from(InputDeviceProperties::VERSION),
             NamedProperty::from(InputDeviceProperties::EVENT),
         ]
     }

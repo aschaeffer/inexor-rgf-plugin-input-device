@@ -13,7 +13,10 @@ use waiter_di::{profiles, Container, Provider};
 use crate::plugin::InputDevicePlugin;
 use crate::plugins::{Plugin, PluginError};
 
+pub mod api;
 pub mod behaviour;
+pub mod config;
+pub mod implementation;
 pub mod plugin;
 pub mod provider;
 

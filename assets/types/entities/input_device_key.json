@@ -1,7 +1,7 @@
 {
   "name": "input_device_key",
   "group": "hardware",
-  "description": "Input Device Key",
+  "description": "A key of an input device",
   "components": [
     "named",
     "flow_2d",
@@ -103,7 +103,7 @@
       "name": "dublin-core",
       "extension":{
         "title": "Input Device Key",
-        "subject": "Input Device Key",
+        "subject": "A key of an input device",
         "creator": "Hanack"
       }
     }

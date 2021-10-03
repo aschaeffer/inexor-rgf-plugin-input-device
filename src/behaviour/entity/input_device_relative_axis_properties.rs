@@ -6,6 +6,8 @@ use strum_macros::{AsRefStr, IntoStaticStr, ToString};
 #[allow(non_camel_case_types)]
 #[derive(AsRefStr, IntoStaticStr, ToString)]
 pub enum InputDeviceRelativeAxisProperties {
+    #[strum(serialize = "relative_axis")]
+    RELATIVE_AXIS,
     #[strum(serialize = "relative_axis_type")]
     RELATIVE_AXIS_TYPE,
     #[strum(serialize = "state")]
@@ -15,12 +17,14 @@ pub enum InputDeviceRelativeAxisProperties {
 impl InputDeviceRelativeAxisProperties {
     pub fn default_value(&self) -> Value {
         match self {
+            InputDeviceRelativeAxisProperties::RELATIVE_AXIS => json!(String::new()),
             InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE => json!(-1),
             InputDeviceRelativeAxisProperties::STATE => json!(0),
         }
     }
     pub fn properties() -> NamedProperties {
         vec![
+            NamedProperty::from(InputDeviceRelativeAxisProperties::RELATIVE_AXIS),
             NamedProperty::from(InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE),
             NamedProperty::from(InputDeviceRelativeAxisProperties::STATE),
         ]

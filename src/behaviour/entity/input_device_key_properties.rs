@@ -6,6 +6,8 @@ use strum_macros::{AsRefStr, IntoStaticStr, ToString};
 #[allow(non_camel_case_types)]
 #[derive(AsRefStr, IntoStaticStr, ToString)]
 pub enum InputDeviceKeyProperties {
+    #[strum(serialize = "key")]
+    KEY,
     #[strum(serialize = "key_code")]
     KEY_CODE,
     #[strum(serialize = "key_down")]
@@ -15,12 +17,14 @@ pub enum InputDeviceKeyProperties {
 impl InputDeviceKeyProperties {
     pub fn default_value(&self) -> Value {
         match self {
+            InputDeviceKeyProperties::KEY => json!(String::new()),
             InputDeviceKeyProperties::KEY_CODE => json!(-1),
             InputDeviceKeyProperties::KEY_DOWN => json!(false),
         }
     }
     pub fn properties() -> NamedProperties {
         vec![
+            NamedProperty::from(InputDeviceKeyProperties::KEY),
             NamedProperty::from(InputDeviceKeyProperties::KEY_CODE),
             NamedProperty::from(InputDeviceKeyProperties::KEY_DOWN),
         ]

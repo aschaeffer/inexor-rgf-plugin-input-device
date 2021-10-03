@@ -1,0 +1,10 @@
+{
+  "name": "absolute_axis_event",
+  "description": "Absolute Axis Event of an input device, used for touch events and joysticks",
+  "outbound_type": "input_device",
+  "inbound_type": "input_device_absolute_axis",
+  "components": [
+  ],
+  "properties": [
+  ]
+}

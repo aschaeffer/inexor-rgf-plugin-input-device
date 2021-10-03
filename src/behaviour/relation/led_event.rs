@@ -15,7 +15,7 @@ use crate::reactive::entity::Disconnectable;
 use inexor_rgf_core_model::PropertyInstanceSetter;
 use inexor_rgf_core_reactive::BehaviourCreationError;
 
-const LED_EVENT: &'static str = "led_event";
+pub const LED_EVENT: &'static str = "led_event";
 
 pub struct LedEvent {
     pub relation: Arc<ReactiveRelationInstance>,
@@ -49,7 +49,6 @@ impl LedEvent {
             .unwrap()
             .observe_with_handle(
                 move |v| {
-                    debug!("LED EVENT {}", v.clone());
                     let event = v.clone();
                     if !event.is_object() {
                         return;
