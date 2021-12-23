@@ -44,6 +44,10 @@ absolute axes (joystick, touchpad), leds (numlock) and switches (power buttons).
 [<img src="https://img.shields.io/github/license/aschaeffer/inexor-rgf-plugin-input-device">](https://github.com/aschaeffer/inexor-rgf-plugin-input-device/blob/main/LICENSE)
 [<img src="https://img.shields.io/discord/698219248954376256?logo=discord">](https://discord.com/invite/acUW8k7)
 
+#### Type System
+
+<img src="https://raw.githubusercontent.com/aschaeffer/inexor-rgf-plugin-input-device/main/docs/images/type_system.png">
+
 #### Entity Types
 
 | Name | Property | Data Type | Socket Type |
