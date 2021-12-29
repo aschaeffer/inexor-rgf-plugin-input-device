@@ -12,9 +12,7 @@ use crate::plugins::EntityBehaviourProvider;
 const INPUT_DEVICE: &'static str = "input_device";
 
 #[wrapper]
-pub struct InputDeviceStorage(
-    std::sync::RwLock<std::collections::HashMap<Uuid, std::sync::Arc<DeviceInput>>>,
-);
+pub struct InputDeviceStorage(std::sync::RwLock<std::collections::HashMap<Uuid, std::sync::Arc<DeviceInput>>>);
 
 #[waiter_di::provides]
 fn create_input_device_storage() -> InputDeviceStorage {
@@ -55,34 +53,20 @@ impl InputDeviceEntityBehaviourProvider for InputDeviceEntityBehaviourProviderIm
         let device_key = DeviceInput::new(entity_instance);
         if device_key.is_ok() {
             let input_device = Arc::new(device_key.unwrap());
-            self.input_device
-                .0
-                .write()
-                .unwrap()
-                .insert(id, input_device);
+            self.input_device.0.write().unwrap().insert(id, input_device);
             debug!("Added behaviour {} to entity instance {}", INPUT_DEVICE, id);
         }
     }
 
     fn remove_input_device(&self, entity_instance: Arc<ReactiveEntityInstance>) {
-        self.input_device
-            .0
-            .write()
-            .unwrap()
-            .remove(&entity_instance.id);
-        debug!(
-            "Removed behaviour {} from entity instance {}",
-            INPUT_DEVICE, entity_instance.id
-        );
+        self.input_device.0.write().unwrap().remove(&entity_instance.id);
+        debug!("Removed behaviour {} from entity instance {}", INPUT_DEVICE, entity_instance.id);
     }
 
     fn remove_by_id(&self, id: Uuid) {
         if self.input_device.0.write().unwrap().contains_key(&id) {
             self.input_device.0.write().unwrap().remove(&id);
-            debug!(
-                "Removed behaviour {} to entity instance {}",
-                INPUT_DEVICE, id
-            );
+            debug!("Removed behaviour {} to entity instance {}", INPUT_DEVICE, id);
         }
     }
 }

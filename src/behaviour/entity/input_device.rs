@@ -9,8 +9,7 @@ use serde_json::json;
 
 use crate::behaviour::entity::InputDeviceProperties;
 use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_KIND_LED_EVENT,
-    INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEY_CODE,
+    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEY_CODE,
     LED_EVENT_LED_TYPE, RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE,
 };
 use crate::model::PropertyInstanceGetter;
@@ -31,26 +30,17 @@ pub struct DeviceInput {
 
 impl DeviceInput {
     pub fn new<'a>(e: Arc<ReactiveEntityInstance>) -> Result<DeviceInput, BehaviourCreationError> {
-        let physical_path = e
-            .properties
-            .get(InputDeviceProperties::PHYSICAL_PATH.as_ref());
+        let physical_path = e.properties.get(InputDeviceProperties::PHYSICAL_PATH.as_ref());
         if physical_path.is_none() {
             error!("Missing physical_path");
             return Err(BehaviourCreationError.into());
         }
         let physical_path = physical_path.unwrap().as_string().unwrap();
 
-        let name = e
-            .as_string(InputDeviceProperties::NAME)
-            .unwrap_or("Unknown Device".into());
-        trace!(
-            "Initializing behaviour for input device {} with physical path {}",
-            name,
-            physical_path
-        );
+        let name = e.as_string(InputDeviceProperties::NAME).unwrap_or("Unknown Device".into());
+        trace!("Initializing behaviour for input device {} with physical path {}", name, physical_path);
 
-        let device =
-            evdev::enumerate().find(|d| physical_path.as_str() == d.physical_path().unwrap_or(""));
+        let device = evdev::enumerate().find(|d| physical_path.as_str() == d.physical_path().unwrap_or(""));
         if device.is_none() {
             return Err(BehaviourCreationError.into());
         }
@@ -68,9 +58,7 @@ impl DeviceInput {
                 return;
             }
 
-            let property_event = entity_instance
-                .properties
-                .get(InputDeviceProperties::EVENT.as_ref());
+            let property_event = entity_instance.properties.get(InputDeviceProperties::EVENT.as_ref());
             if property_event.is_none() {
                 error!("Missing property event");
                 return;

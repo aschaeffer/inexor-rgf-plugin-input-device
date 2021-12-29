@@ -10,14 +10,10 @@ use crate::behaviour::relation::relation_behaviour_provider::InputDeviceRelation
 use crate::plugins::plugin::PluginMetadata;
 use crate::plugins::plugin_context::PluginContext;
 use crate::plugins::{
-    ComponentBehaviourProvider, ComponentProvider, EntityBehaviourProvider, EntityTypeProvider,
-    FlowProvider, Plugin, PluginError, RelationBehaviourProvider, RelationTypeProvider,
-    WebResourceProvider,
+    ComponentBehaviourProvider, ComponentProvider, EntityBehaviourProvider, EntityTypeProvider, FlowProvider, Plugin, PluginError, RelationBehaviourProvider,
+    RelationTypeProvider, WebResourceProvider,
 };
-use crate::provider::{
-    InputDeviceEntityTypeProviderImpl, InputDeviceFlowProviderImpl,
-    InputDeviceRelationTypeProviderImpl,
-};
+use crate::provider::{InputDeviceEntityTypeProviderImpl, InputDeviceFlowProviderImpl, InputDeviceRelationTypeProviderImpl};
 use std::env;
 
 #[wrapper]
@@ -96,8 +92,7 @@ impl Plugin for InputDevicePluginImpl {
 
     fn get_entity_type_provider(&self) -> Result<Arc<dyn EntityTypeProvider>, PluginError> {
         let entity_type_provider = self.entity_type_provider.clone();
-        let entity_type_provider: Result<Arc<dyn EntityTypeProvider>, _> =
-            <dyn query_interface::Object>::query_arc(entity_type_provider);
+        let entity_type_provider: Result<Arc<dyn EntityTypeProvider>, _> = <dyn query_interface::Object>::query_arc(entity_type_provider);
         if entity_type_provider.is_err() {
             return Err(PluginError::NoEntityTypeProvider);
         }
@@ -106,38 +101,29 @@ impl Plugin for InputDevicePluginImpl {
 
     fn get_relation_type_provider(&self) -> Result<Arc<dyn RelationTypeProvider>, PluginError> {
         let relation_type_provider = self.relation_type_provider.clone();
-        let relation_type_provider: Result<Arc<dyn RelationTypeProvider>, _> =
-            <dyn query_interface::Object>::query_arc(relation_type_provider);
+        let relation_type_provider: Result<Arc<dyn RelationTypeProvider>, _> = <dyn query_interface::Object>::query_arc(relation_type_provider);
         if relation_type_provider.is_err() {
             return Err(PluginError::NoRelationTypeProvider);
         }
         Ok(relation_type_provider.unwrap())
     }
 
-    fn get_component_behaviour_provider(
-        &self,
-    ) -> Result<Arc<dyn ComponentBehaviourProvider>, PluginError> {
+    fn get_component_behaviour_provider(&self) -> Result<Arc<dyn ComponentBehaviourProvider>, PluginError> {
         Err(PluginError::NoComponentBehaviourProvider)
     }
 
-    fn get_entity_behaviour_provider(
-        &self,
-    ) -> Result<Arc<dyn EntityBehaviourProvider>, PluginError> {
+    fn get_entity_behaviour_provider(&self) -> Result<Arc<dyn EntityBehaviourProvider>, PluginError> {
         let entity_behaviour_provider = self.entity_behaviour_provider.clone();
-        let entity_behaviour_provider: Result<Arc<dyn EntityBehaviourProvider>, _> =
-            <dyn query_interface::Object>::query_arc(entity_behaviour_provider);
+        let entity_behaviour_provider: Result<Arc<dyn EntityBehaviourProvider>, _> = <dyn query_interface::Object>::query_arc(entity_behaviour_provider);
         if entity_behaviour_provider.is_err() {
             return Err(PluginError::NoEntityBehaviourProvider);
         }
         Ok(entity_behaviour_provider.unwrap())
     }
 
-    fn get_relation_behaviour_provider(
-        &self,
-    ) -> Result<Arc<dyn RelationBehaviourProvider>, PluginError> {
+    fn get_relation_behaviour_provider(&self) -> Result<Arc<dyn RelationBehaviourProvider>, PluginError> {
         let relation_behaviour_provider = self.relation_behaviour_provider.clone();
-        let relation_behaviour_provider: Result<Arc<dyn RelationBehaviourProvider>, _> =
-            <dyn query_interface::Object>::query_arc(relation_behaviour_provider);
+        let relation_behaviour_provider: Result<Arc<dyn RelationBehaviourProvider>, _> = <dyn query_interface::Object>::query_arc(relation_behaviour_provider);
         if relation_behaviour_provider.is_err() {
             return Err(PluginError::NoRelationBehaviourProvider);
         }
@@ -146,8 +132,7 @@ impl Plugin for InputDevicePluginImpl {
 
     fn get_flow_provider(&self) -> Result<Arc<dyn FlowProvider>, PluginError> {
         let flow_provider = self.flow_provider.clone();
-        let flow_provider: Result<Arc<dyn FlowProvider>, _> =
-            <dyn query_interface::Object>::query_arc(flow_provider);
+        let flow_provider: Result<Arc<dyn FlowProvider>, _> = <dyn query_interface::Object>::query_arc(flow_provider);
         if flow_provider.is_err() {
             return Err(PluginError::NoFlowProvider);
         }

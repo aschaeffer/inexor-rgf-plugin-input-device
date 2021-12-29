@@ -9,8 +9,6 @@ pub const INPUT_EVENT_KIND_SWITCH_EVENT: &'static str = "switch_event";
 
 pub const KEY_EVENT_KEY_CODE: &'static str = "key_event_key_code";
 pub const LED_EVENT_LED_TYPE: &'static str = "led_event_led_type";
-pub const RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE: &'static str =
-    "relative_axis_event_relative_axis_type";
-pub const ABSOLUTE_AXIS_EVENT_ABSOLUTE_AXIS_TYPE: &'static str =
-    "absolute_axis_event_absolute_axis_type";
+pub const RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE: &'static str = "relative_axis_event_relative_axis_type";
+pub const ABSOLUTE_AXIS_EVENT_ABSOLUTE_AXIS_TYPE: &'static str = "absolute_axis_event_absolute_axis_type";
 pub const SWITCH_EVENT_SWITCH_TYPE: &'static str = "switch_event_switch_type";

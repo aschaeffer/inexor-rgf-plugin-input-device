@@ -6,10 +6,7 @@ use serde_json::json;
 
 use crate::behaviour::entity::input_device_properties::InputDeviceProperties;
 use crate::behaviour::entity::input_device_relative_axis_properties::InputDeviceRelativeAxisProperties;
-use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE,
-    RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE,
-};
+use crate::behaviour::event_payload::{INPUT_EVENT_KIND, INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE, RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE};
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveRelationInstance;
 use crate::reactive::entity::Disconnectable;
@@ -25,25 +22,16 @@ pub struct RelativeAxisEvent {
 }
 
 impl RelativeAxisEvent {
-    pub fn new<'a>(
-        r: Arc<ReactiveRelationInstance>,
-    ) -> Result<RelativeAxisEvent, BehaviourCreationError> {
+    pub fn new<'a>(r: Arc<ReactiveRelationInstance>) -> Result<RelativeAxisEvent, BehaviourCreationError> {
         let input_device = r.outbound.clone();
         let input_device_relative_axis = r.inbound.clone();
-        let input_device_relative_axis_relative_axis_type = input_device_relative_axis
-            .as_i64(InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE);
+        let input_device_relative_axis_relative_axis_type = input_device_relative_axis.as_i64(InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE);
         if input_device_relative_axis_relative_axis_type.is_none() {
             return Err(BehaviourCreationError.into());
         }
-        let input_device_relative_axis_relative_axis_type =
-            input_device_relative_axis_relative_axis_type.unwrap();
+        let input_device_relative_axis_relative_axis_type = input_device_relative_axis_relative_axis_type.unwrap();
 
-        let handle_id = input_device
-            .properties
-            .get(InputDeviceProperties::EVENT.as_ref())
-            .unwrap()
-            .id
-            .as_u128();
+        let handle_id = input_device.properties.get(InputDeviceProperties::EVENT.as_ref()).unwrap().id.as_u128();
 
         input_device
             .properties
@@ -65,20 +53,11 @@ impl RelativeAxisEvent {
 
                     match input_event_kind.unwrap().as_str().unwrap() {
                         INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT => {
-                            let event_relative_axis_type = event
-                                .get(RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE)
-                                .unwrap()
-                                .as_i64()
-                                .unwrap_or(-1);
-                            if input_device_relative_axis_relative_axis_type
-                                == event_relative_axis_type
-                            {
+                            let event_relative_axis_type = event.get(RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE).unwrap().as_i64().unwrap_or(-1);
+                            if input_device_relative_axis_relative_axis_type == event_relative_axis_type {
                                 let default = json!(0);
                                 let value = event.get(INPUT_EVENT_VALUE).unwrap_or(&default);
-                                input_device_relative_axis.set(
-                                    InputDeviceRelativeAxisProperties::STATE.to_string(),
-                                    value.clone(),
-                                );
+                                input_device_relative_axis.set(InputDeviceRelativeAxisProperties::STATE.to_string(), value.clone());
                             }
                         }
                         _ => {}
@@ -100,22 +79,10 @@ impl RelativeAxisEvent {
 
 impl Disconnectable for RelativeAxisEvent {
     fn disconnect(&self) {
-        debug!(
-            "Disconnecting behaviour {} from property instance {}",
-            RELATIVE_AXIS_EVENT, self.handle_id
-        );
-        let property = self
-            .relation
-            .inbound
-            .properties
-            .get(InputDeviceProperties::EVENT.as_ref());
+        debug!("Disconnecting behaviour {} from property instance {}", RELATIVE_AXIS_EVENT, self.handle_id);
+        let property = self.relation.inbound.properties.get(InputDeviceProperties::EVENT.as_ref());
         if property.is_some() {
-            property
-                .unwrap()
-                .stream
-                .read()
-                .unwrap()
-                .remove(self.handle_id);
+            property.unwrap().stream.read().unwrap().remove(self.handle_id);
         }
     }
 }

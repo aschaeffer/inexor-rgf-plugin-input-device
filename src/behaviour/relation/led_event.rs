@@ -6,9 +6,7 @@ use serde_json::json;
 
 use crate::behaviour::entity::input_device_led_properties::InputDeviceLedProperties;
 use crate::behaviour::entity::input_device_properties::InputDeviceProperties;
-use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_VALUE, LED_EVENT_LED_TYPE,
-};
+use crate::behaviour::event_payload::{INPUT_EVENT_KIND, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_VALUE, LED_EVENT_LED_TYPE};
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveRelationInstance;
 use crate::reactive::entity::Disconnectable;
@@ -33,12 +31,7 @@ impl LedEvent {
         }
         let input_device_led_led_type = input_device_led_led_type.unwrap();
 
-        let handle_id = input_device
-            .properties
-            .get(InputDeviceProperties::EVENT.as_ref())
-            .unwrap()
-            .id
-            .as_u128();
+        let handle_id = input_device.properties.get(InputDeviceProperties::EVENT.as_ref()).unwrap().id.as_u128();
 
         input_device
             .properties
@@ -60,40 +53,22 @@ impl LedEvent {
 
                     match input_event_kind.unwrap().as_str().unwrap() {
                         INPUT_EVENT_KIND_LED_EVENT => {
-                            let event_led_type = event
-                                .get(LED_EVENT_LED_TYPE)
-                                .unwrap()
-                                .as_i64()
-                                .unwrap_or(-1);
+                            let event_led_type = event.get(LED_EVENT_LED_TYPE).unwrap().as_i64().unwrap_or(-1);
                             if input_device_led_led_type == event_led_type {
-                                let old_value = input_device_led
-                                    .get(InputDeviceLedProperties::STATE)
-                                    .unwrap()
-                                    .as_bool()
-                                    .unwrap();
+                                let old_value = input_device_led.get(InputDeviceLedProperties::STATE).unwrap().as_bool().unwrap();
                                 let default = json!(-1);
-                                let value = event
-                                    .get(INPUT_EVENT_VALUE)
-                                    .unwrap_or(&default)
-                                    .as_i64()
-                                    .unwrap();
+                                let value = event.get(INPUT_EVENT_VALUE).unwrap_or(&default).as_i64().unwrap();
                                 match value {
                                     // LED off
                                     0 => {
                                         if old_value {
-                                            input_device_led.set(
-                                                InputDeviceLedProperties::STATE.to_string(),
-                                                json!(false),
-                                            )
+                                            input_device_led.set(InputDeviceLedProperties::STATE.to_string(), json!(false))
                                         }
                                     }
                                     // LED on
                                     1 => {
                                         if !old_value {
-                                            input_device_led.set(
-                                                InputDeviceLedProperties::STATE.to_string(),
-                                                json!(true),
-                                            );
+                                            input_device_led.set(InputDeviceLedProperties::STATE.to_string(), json!(true));
                                         }
                                     }
                                     _ => {}
@@ -119,22 +94,10 @@ impl LedEvent {
 
 impl Disconnectable for LedEvent {
     fn disconnect(&self) {
-        debug!(
-            "Disconnecting behaviour {} from property instance {}",
-            LED_EVENT, self.handle_id
-        );
-        let property = self
-            .relation
-            .inbound
-            .properties
-            .get(InputDeviceProperties::EVENT.as_ref());
+        debug!("Disconnecting behaviour {} from property instance {}", LED_EVENT, self.handle_id);
+        let property = self.relation.inbound.properties.get(InputDeviceProperties::EVENT.as_ref());
         if property.is_some() {
-            property
-                .unwrap()
-                .stream
-                .read()
-                .unwrap()
-                .remove(self.handle_id);
+            property.unwrap().stream.read().unwrap().remove(self.handle_id);
         }
     }
 }
