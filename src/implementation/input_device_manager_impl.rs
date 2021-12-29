@@ -17,6 +17,8 @@ use serde_json::json;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
+const CONFIG_PATH: &str = "./config/input_devices.toml";
+
 #[wrapper]
 pub struct PluginContextContainer(RwLock<Option<std::sync::Arc<dyn PluginContext>>>);
 
@@ -74,16 +76,13 @@ impl InputDeviceManager for InputDeviceManagerImpl {
                     Err(_) => {
                         error!(
                             "Failed to load input devices configuration from {}: Invalid TOML:",
-                            "./config/input_devices.toml"
+                            CONFIG_PATH
                         );
                     }
                 }
             }
             Err(_) => {
-                error!(
-                    "Failed to load plugin configuration from {}",
-                    "./config/plugins.toml"
-                );
+                error!("Failed to load plugin configuration from {}", CONFIG_PATH);
             }
         }
     }
