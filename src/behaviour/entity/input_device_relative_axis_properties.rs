@@ -1,10 +1,10 @@
 use indradb::NamedProperty;
 use inexor_rgf_core_reactive::NamedProperties;
 use serde_json::{json, Value};
-use strum_macros::{AsRefStr, IntoStaticStr, ToString};
+use strum_macros::{AsRefStr, Display, IntoStaticStr};
 
 #[allow(non_camel_case_types)]
-#[derive(AsRefStr, IntoStaticStr, ToString)]
+#[derive(AsRefStr, IntoStaticStr, Display)]
 pub enum InputDeviceRelativeAxisProperties {
     #[strum(serialize = "relative_axis")]
     RELATIVE_AXIS,
