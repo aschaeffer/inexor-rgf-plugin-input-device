@@ -9,8 +9,8 @@ use serde_json::json;
 
 use crate::behaviour::entity::InputDeviceProperties;
 use crate::behaviour::event_payload::{
-    INPUT_EVENT_KIND, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_KIND_LED_EVENT, INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEY_CODE,
-    LED_EVENT_LED_TYPE, RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE,
+    ABSOLUTE_AXIS_EVENT_ABSOLUTE_AXIS_TYPE, INPUT_EVENT_KIND, INPUT_EVENT_KIND_ABSOLUTE_AXIS_EVENT, INPUT_EVENT_KIND_KEY_EVENT, INPUT_EVENT_KIND_LED_EVENT,
+    INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT, INPUT_EVENT_VALUE, KEY_EVENT_KEY_CODE, LED_EVENT_LED_TYPE, RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE,
 };
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveEntityInstance;
@@ -101,6 +101,13 @@ impl DeviceInput {
                                         property_event.set(json!({
                                             INPUT_EVENT_KIND: INPUT_EVENT_KIND_RELATIVE_AXIS_EVENT,
                                             RELATIVE_AXIS_EVENT_RELATIVE_AXIS_TYPE: relative_axis_type.0,
+                                            INPUT_EVENT_VALUE: event.value()
+                                        }))
+                                    }
+                                    InputEventKind::AbsAxis(absolute_axis_type) => {
+                                        property_event.set(json!({
+                                            INPUT_EVENT_KIND: INPUT_EVENT_KIND_ABSOLUTE_AXIS_EVENT,
+                                            ABSOLUTE_AXIS_EVENT_ABSOLUTE_AXIS_TYPE: absolute_axis_type.0,
                                             INPUT_EVENT_VALUE: event.value()
                                         }))
                                     }
