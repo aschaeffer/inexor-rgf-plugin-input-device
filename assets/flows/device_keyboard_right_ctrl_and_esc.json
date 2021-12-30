@@ -1,0 +1,77 @@
+{
+  "id": "f1e1edb9-39b0-4afd-8e7d-edecbcb59b7d",
+  "type": "generic_flow",
+  "name": "Right-Ctrl + Esc",
+  "description": "Press Right-Ctrl + ESC",
+  "entities": [
+    {
+      "type": "generic_flow",
+      "id": "f1e1edb9-39b0-4afd-8e7d-edecbcb59b7d",
+      "properties": {
+      }
+    },
+    {
+      "type": "input_device_key",
+      "id": "fe4f8f9a-7f83-5385-b8ba-de75a01e1661",
+      "properties": {
+        "name": "key_down",
+        "key_down": false,
+        "key_code": 1,
+        "key": "KEY_ESC"
+      }
+    },
+    {
+      "type": "input_device_key",
+      "id": "0c76e8d1-5a77-56b9-80eb-fd8e219c4133",
+      "properties": {
+        "name": "key_down",
+        "key_down": false,
+        "key_code": 1,
+        "key": "KEY_RIGHTCTRL"
+      }
+    },
+    {
+      "type": "and",
+      "id": "b969b749-7521-4563-8e11-8fa653a1ffd8",
+      "properties": {
+        "lhs": false,
+        "rhs": false,
+        "result": false
+      }
+    },
+    {
+      "type": "value",
+      "id": "badadc77-62bc-4971-9882-aafde08ccb8f",
+      "properties": {
+        "value": false
+      }
+    }
+  ],
+  "relations": [
+    {
+      "outbound_id": "fe4f8f9a-7f83-5385-b8ba-de75a01e1661",
+      "type": "default_connector--key_down--lhs",
+      "inbound_id": "b969b749-7521-4563-8e11-8fa653a1ffd8",
+      "properties": {
+        "outbound_property_name": "key_down",
+        "inbound_property_name": "lhs"
+      }
+    }, {
+      "outbound_id": "0c76e8d1-5a77-56b9-80eb-fd8e219c4133",
+      "type": "default_connector--key_down--rhs",
+      "inbound_id": "b969b749-7521-4563-8e11-8fa653a1ffd8",
+      "properties": {
+        "outbound_property_name": "key_down",
+        "inbound_property_name": "rhs"
+      }
+    }, {
+      "outbound_id": "b969b749-7521-4563-8e11-8fa653a1ffd8",
+      "type": "default_connector--result--value",
+      "inbound_id": "badadc77-62bc-4971-9882-aafde08ccb8f",
+      "properties": {
+        "outbound_property_name": "result",
+        "inbound_property_name": "value"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+query key_esc {
+  instances {
+    key_esc: entities(id: "fe4f8f9a-7f83-5385-b8ba-de75a01e1661") {
+      id,
+      type {name},
+      properties(
+        names: [
+          "name",
+          "key",
+          "key_code",
+          "key_down"
+        ]
+      )
+    }
+  }
+}
