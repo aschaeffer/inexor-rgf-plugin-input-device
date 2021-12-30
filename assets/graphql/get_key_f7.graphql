@@ -1,6 +1,6 @@
 query key_f7 {
   instances {
-    key_f7: entities(id: "c20ef460-c6b7-5013-88ec-ebd3454d6831") {
+    key_f7: entities(id: "c7ec76e0-40e8-587e-bc89-e9cd31fa75a0") {
       id,
       type {name},
       properties(

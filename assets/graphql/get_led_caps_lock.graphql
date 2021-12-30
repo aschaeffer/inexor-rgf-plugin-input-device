@@ -1,6 +1,6 @@
 query led_caps_lock {
   instances {
-    led_caps_lock: entities(id: "f41ffc7a-b4a1-5d60-a761-0e35b2f3ae19") {
+    led_caps_lock: entities(id: "d14b374c-115c-59db-95ad-67a62d7850ef") {
       id,
       type {name},
       properties(

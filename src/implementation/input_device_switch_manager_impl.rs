@@ -9,6 +9,8 @@ use crate::builder::{EntityInstanceBuilder, RelationInstanceBuilder};
 use crate::model::ReactiveEntityInstance;
 use crate::plugins::PluginContext;
 use evdev::{Device, SwitchType};
+use inexor_rgf_core_model::EntityInstance;
+use inexor_rgf_core_plugins::entity_instance_manager::EntityInstanceCreationError;
 use serde_json::json;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
@@ -47,25 +49,54 @@ impl InputDeviceSwitchManager for InputDeviceSwitchManagerImpl {
         }
     }
 
-    fn create_input_device_switch(&self, device: &Device, input_device_entity_instance: Arc<ReactiveEntityInstance>, switch: SwitchType) {
+    fn create_input_device_switch(&self, device: &Device, input_device: Arc<ReactiveEntityInstance>, switch: SwitchType) {
+        let reader = self.context.0.read().unwrap();
+        let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
         let device_name = device.name().unwrap_or("Unnamed Device");
         let physical_path = device.physical_path().unwrap_or("");
         let switch_name = format!("{:?}", switch);
         let unique_name = format!("{}-{}-{}", device_name, physical_path, switch_name);
+        let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
+        let input_device_switch = self.create_entity_instance(uuid, unique_name.clone(), switch_name.clone(), switch);
+        let input_device_switch = entity_instance_manager.create(input_device_switch);
+        self.try_create_switch_event(input_device, input_device_switch, unique_name);
+    }
+
+    fn create_any_device_switch(&self, input_device: Arc<ReactiveEntityInstance>, switch: SwitchType) {
         let reader = self.context.0.read().unwrap();
-        let input_device_switch = EntityInstanceBuilder::new(INPUT_DEVICE_SWITCH)
-            .id(Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes()))
+        let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
+        let switch_name = format!("{:?}", switch);
+        let unique_name = format!("any-device-{}", switch_name);
+        let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
+        if !entity_instance_manager.has(uuid) {
+            let input_device_switch = self.create_entity_instance(uuid, unique_name.clone(), switch_name.clone(), switch);
+            let input_device_switch = entity_instance_manager.create(input_device_switch);
+            self.try_create_switch_event(input_device, input_device_switch, unique_name);
+        } else {
+            self.create_switch_event(input_device.clone(), entity_instance_manager.get(uuid).unwrap().clone());
+        }
+    }
+
+    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, switch_name: String, switch: SwitchType) -> EntityInstance {
+        EntityInstanceBuilder::new(INPUT_DEVICE_SWITCH)
+            .id(uuid)
             .property("name", json!(unique_name))
             .property(InputDeviceSwitchProperties::SWITCH.as_ref(), json!(switch_name))
             .property(InputDeviceSwitchProperties::SWITCH_TYPE.as_ref(), json!(switch.0))
             .property(InputDeviceSwitchProperties::STATE.as_ref(), InputDeviceSwitchProperties::STATE.default_value())
-            .get();
-        let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
-        let input_device_switch = entity_instance_manager.create(input_device_switch);
+            .get()
+    }
+
+    fn try_create_switch_event(
+        &self,
+        input_device: Arc<ReactiveEntityInstance>,
+        input_device_switch: Result<Arc<ReactiveEntityInstance>, EntityInstanceCreationError>,
+        unique_name: String,
+    ) {
         match input_device_switch {
             Ok(input_device_switch) => {
                 trace!("Registered {} {} as {}", INPUT_DEVICE_SWITCH, unique_name, input_device_switch.id);
-                self.create_switch_event(input_device_entity_instance.clone(), input_device_switch.clone());
+                self.create_switch_event(input_device.clone(), input_device_switch.clone());
             }
             Err(_) => {
                 error!("Failed to create entity instance for {} {}!", INPUT_DEVICE_SWITCH, unique_name);
@@ -74,9 +105,9 @@ impl InputDeviceSwitchManager for InputDeviceSwitchManagerImpl {
     }
 
     fn create_switch_event(&self, input_device: Arc<ReactiveEntityInstance>, input_device_switch: Arc<ReactiveEntityInstance>) {
-        let switch_event = RelationInstanceBuilder::new(input_device.id, SWITCH_EVENT, input_device_switch.id).get();
         let reader = self.context.0.read().unwrap();
         let relation_instance_manager = reader.as_ref().unwrap().get_relation_instance_manager().clone();
+        let switch_event = RelationInstanceBuilder::new(input_device.id, SWITCH_EVENT, input_device_switch.id).get();
         let _switch_event = relation_instance_manager.create(switch_event);
     }
 }

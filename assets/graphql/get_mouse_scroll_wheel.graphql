@@ -1,6 +1,6 @@
 query scroll_wheel {
   instances {
-    scroll_wheel: entities(id: "cad9c879-2b79-59f0-a0a4-6fa50818cf06") {
+    scroll_wheel: entities(id: "9c116981-15b5-5ea0-b43f-4bfd6fe1fa62") {
       id,
       type {name},
       properties(

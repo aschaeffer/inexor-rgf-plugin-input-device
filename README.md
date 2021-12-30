@@ -743,6 +743,21 @@ in hardware.
 | SW_PEN_INSERTED | set = pen inserted |
 | SW_MACHINE_COVER | set = cover closed |
 
+### Shared Keys, LEDs, Buttons, Axis
+
+Having two or multiple keyboards:
+
+<img src="https://raw.githubusercontent.com/aschaeffer/inexor-rgf-plugin-input-device/main/docs/images/two_keyboards.png">
+
+Key and LED events will be propagated to `any-device-keys` and `any-device-leds`:
+
+<img src="https://raw.githubusercontent.com/aschaeffer/inexor-rgf-plugin-input-device/main/docs/images/two_keyboards_shared_keys.png">
+
+<img src="https://raw.githubusercontent.com/aschaeffer/inexor-rgf-plugin-input-device/main/docs/images/two_keyboards_shared_leds.png">
+
+The same applies to mouse buttons and axis:
+
+<img src="https://raw.githubusercontent.com/aschaeffer/inexor-rgf-plugin-input-device/main/docs/images/two_mice_shared_buttons_and_axis.png">
 
 ### TODO
 
