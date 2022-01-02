@@ -1,0 +1,27 @@
+mutation {
+  instances {
+    entities {
+      update(
+        id: "3212d494-2365-543e-87fa-07abdf4315c7",
+        properties: [
+          {
+            name: "set_key_down",
+            value: true
+          }
+        ]
+      ) {
+        id,
+        type {name},
+        properties(
+          names: [
+            "name",
+            "key",
+            "key_code",
+            "key_down",
+            "set_key_down"
+          ]
+        )
+      }
+    }
+  }
+}

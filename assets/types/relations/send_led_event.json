@@ -1,0 +1,10 @@
+{
+  "name": "send_led_event",
+  "description": "Sends a LED event to an input device",
+  "outbound_type": "input_device_led",
+  "inbound_type": "input_device",
+  "components": [
+  ],
+  "properties": [
+  ]
+}

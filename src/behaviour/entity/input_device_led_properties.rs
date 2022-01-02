@@ -12,6 +12,8 @@ pub enum InputDeviceLedProperties {
     LED_TYPE,
     #[strum(serialize = "state")]
     STATE,
+    #[strum(serialize = "set_state")]
+    SET_STATE,
 }
 
 impl InputDeviceLedProperties {
@@ -20,6 +22,7 @@ impl InputDeviceLedProperties {
             InputDeviceLedProperties::LED => json!(String::new()),
             InputDeviceLedProperties::LED_TYPE => json!(-1),
             InputDeviceLedProperties::STATE => json!(false),
+            InputDeviceLedProperties::SET_STATE => json!(false),
         }
     }
     pub fn properties() -> NamedProperties {
@@ -27,6 +30,7 @@ impl InputDeviceLedProperties {
             NamedProperty::from(InputDeviceLedProperties::LED),
             NamedProperty::from(InputDeviceLedProperties::LED_TYPE),
             NamedProperty::from(InputDeviceLedProperties::STATE),
+            NamedProperty::from(InputDeviceLedProperties::SET_STATE),
         ]
     }
 }

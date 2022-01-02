@@ -26,7 +26,8 @@ pub trait InputDeviceLedManager: Send + Sync {
         input_device: Arc<ReactiveEntityInstance>,
         input_device_led: Result<Arc<ReactiveEntityInstance>, EntityInstanceCreationError>,
         unique_name: String,
+        create_send_led: bool,
     );
 
-    fn create_led_event(&self, input_device: Arc<ReactiveEntityInstance>, input_device_led: Arc<ReactiveEntityInstance>);
+    fn create_led_event(&self, input_device: Arc<ReactiveEntityInstance>, input_device_led: Arc<ReactiveEntityInstance>, create_send_led: bool);
 }

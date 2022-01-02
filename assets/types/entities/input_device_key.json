@@ -22,6 +22,11 @@
       "name": "key_down",
       "data_type": "bool",
       "socket_type": "output"
+    },
+    {
+      "name": "set_key_down",
+      "data_type": "bool",
+      "socket_type": "input"
     }
   ],
   "extensions": [

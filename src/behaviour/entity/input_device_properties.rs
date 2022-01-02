@@ -20,6 +20,8 @@ pub enum InputDeviceProperties {
     VERSION,
     #[strum(serialize = "event")]
     EVENT,
+    #[strum(serialize = "send_event")]
+    SEND_EVENT,
 }
 
 impl InputDeviceProperties {
@@ -32,6 +34,7 @@ impl InputDeviceProperties {
             InputDeviceProperties::PRODUCT => json!(0),
             InputDeviceProperties::VERSION => json!(0),
             InputDeviceProperties::EVENT => json!({}),
+            InputDeviceProperties::SEND_EVENT => json!({}),
         }
     }
     pub fn properties() -> NamedProperties {
@@ -43,6 +46,7 @@ impl InputDeviceProperties {
             NamedProperty::from(InputDeviceProperties::PRODUCT),
             NamedProperty::from(InputDeviceProperties::VERSION),
             NamedProperty::from(InputDeviceProperties::EVENT),
+            NamedProperty::from(InputDeviceProperties::SEND_EVENT),
         ]
     }
 }

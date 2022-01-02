@@ -5,6 +5,7 @@ use waiter_di::*;
 use crate::api::{InputDeviceKeyManager, INPUT_DEVICE_KEY, NAMESPACE_INPUT_DEVICE};
 use crate::behaviour::entity::InputDeviceKeyProperties;
 use crate::behaviour::relation::key_event::KEY_EVENT;
+use crate::behaviour::relation::send_key_event::SEND_KEY_EVENT;
 use crate::builder::{EntityInstanceBuilder, RelationInstanceBuilder};
 use crate::model::ReactiveEntityInstance;
 use crate::plugins::PluginContext;
@@ -60,7 +61,7 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
         let input_device_key = self.create_entity_instance(uuid, unique_name.clone(), key_name.clone(), key);
         let input_device_key = entity_instance_manager.create(input_device_key);
-        self.try_create_key_event(input_device, input_device_key, unique_name);
+        self.try_create_key_event(input_device, input_device_key, unique_name, true);
     }
 
     fn create_any_device_key(&self, input_device: Arc<ReactiveEntityInstance>, key: Key) {
@@ -72,9 +73,9 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
         if !entity_instance_manager.has(uuid) {
             let input_device_key = self.create_entity_instance(uuid, unique_name.clone(), key_name.clone(), key);
             let input_device_key = entity_instance_manager.create(input_device_key);
-            self.try_create_key_event(input_device, input_device_key, unique_name);
+            self.try_create_key_event(input_device, input_device_key, unique_name, false);
         } else {
-            self.create_key_event(input_device.clone(), entity_instance_manager.get(uuid).unwrap().clone());
+            self.create_key_event(input_device.clone(), entity_instance_manager.get(uuid).unwrap().clone(), false);
         }
     }
 
@@ -93,11 +94,12 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
         input_device: Arc<ReactiveEntityInstance>,
         input_device_key: Result<Arc<ReactiveEntityInstance>, EntityInstanceCreationError>,
         unique_name: String,
+        create_send_key: bool,
     ) {
         match input_device_key {
             Ok(input_device_key) => {
                 trace!("Registered {} {} as {}", INPUT_DEVICE_KEY, unique_name, input_device_key.id);
-                self.create_key_event(input_device.clone(), input_device_key.clone());
+                self.create_key_event(input_device.clone(), input_device_key.clone(), create_send_key);
             }
             Err(_) => {
                 error!("Failed to create entity instance for {} {}!", INPUT_DEVICE_KEY, unique_name);
@@ -105,10 +107,14 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
         }
     }
 
-    fn create_key_event(&self, input_device: Arc<ReactiveEntityInstance>, input_device_key: Arc<ReactiveEntityInstance>) {
+    fn create_key_event(&self, input_device: Arc<ReactiveEntityInstance>, input_device_key: Arc<ReactiveEntityInstance>, create_send_key: bool) {
         let reader = self.context.0.read().unwrap();
         let relation_instance_manager = reader.as_ref().unwrap().get_relation_instance_manager().clone();
         let key_event = RelationInstanceBuilder::new(input_device.id, KEY_EVENT, input_device_key.id).get();
         let _key_event = relation_instance_manager.create(key_event);
+        if create_send_key {
+            let send_key_event = RelationInstanceBuilder::new(input_device_key.id, SEND_KEY_EVENT, input_device.id).get();
+            let _send_key_event = relation_instance_manager.create(send_key_event);
+        }
     }
 }

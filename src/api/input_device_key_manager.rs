@@ -26,7 +26,8 @@ pub trait InputDeviceKeyManager: Send + Sync {
         input_device: Arc<ReactiveEntityInstance>,
         input_device_key: Result<Arc<ReactiveEntityInstance>, EntityInstanceCreationError>,
         unique_name: String,
+        create_send_key: bool,
     );
 
-    fn create_key_event(&self, input_device: Arc<ReactiveEntityInstance>, input_device_key: Arc<ReactiveEntityInstance>);
+    fn create_key_event(&self, input_device: Arc<ReactiveEntityInstance>, input_device_key: Arc<ReactiveEntityInstance>, create_send_key: bool);
 }

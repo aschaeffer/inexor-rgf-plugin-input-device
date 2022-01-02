@@ -1,0 +1,10 @@
+{
+  "name": "send_key_event",
+  "description": "Sends a key event to an input device",
+  "outbound_type": "input_device_key",
+  "inbound_type": "input_device",
+  "components": [
+  ],
+  "properties": [
+  ]
+}

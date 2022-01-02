@@ -1,0 +1,27 @@
+mutation {
+  instances {
+    entities {
+      update(
+      id: "3d1afcf2-769b-54fc-8777-cc32ed70abe4",
+        properties: [
+          {
+            name: "set_state",
+            value: true
+          }
+        ]
+      ) {
+        id,
+        type {name},
+        properties(
+          names: [
+            "name",
+            "led",
+            "led_type",
+            "state"
+            "set_state"
+          ]
+        )
+      }
+    }
+  }
+}

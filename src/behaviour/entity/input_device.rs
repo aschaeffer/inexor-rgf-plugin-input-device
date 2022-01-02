@@ -1,11 +1,12 @@
 use std::convert::AsRef;
+use std::num::TryFromIntError;
 use std::sync::Arc;
 use std::time::Duration;
 
 use crate::reactive::BehaviourCreationError;
 use async_std::task;
 use log::{debug, error, trace};
-use serde_json::json;
+use serde_json::{json, Value};
 
 use crate::behaviour::entity::InputDeviceProperties;
 use crate::behaviour::event_payload::{
@@ -16,21 +17,23 @@ use crate::behaviour::event_payload::{
 use crate::model::PropertyInstanceGetter;
 use crate::model::ReactiveEntityInstance;
 use crate::reactive::entity::Disconnectable;
-use evdev::InputEventKind;
+use evdev::{EventType, InputEvent, InputEventKind};
 use futures::FutureExt;
 use futures::{select, StreamExt};
 use futures_timer::Delay;
 
 pub const INPUT_DEVICE: &'static str = "input_device";
 
-pub struct DeviceInput {
+pub struct InputDevice {
     pub entity: Arc<ReactiveEntityInstance>,
+
+    pub handle_id: u128,
 
     stopper: crossbeam::channel::Sender<()>,
 }
 
-impl DeviceInput {
-    pub fn new<'a>(e: Arc<ReactiveEntityInstance>) -> Result<DeviceInput, BehaviourCreationError> {
+impl InputDevice {
+    pub fn new<'a>(e: Arc<ReactiveEntityInstance>) -> Result<InputDevice, BehaviourCreationError> {
         let physical_path = e.properties.get(InputDeviceProperties::PHYSICAL_PATH.as_ref());
         if physical_path.is_none() {
             error!("Missing physical_path");
@@ -45,9 +48,71 @@ impl DeviceInput {
         if device.is_none() {
             return Err(BehaviourCreationError.into());
         }
-        let device = device.unwrap();
+        let mut device = device.unwrap();
 
-        let (tx, rx) = crossbeam::channel::bounded(1);
+        let handle_id = e.properties.get(InputDeviceProperties::SEND_EVENT.as_ref()).unwrap().id.as_u128();
+
+        let physical_path_2 = physical_path.clone();
+        e.properties
+            .get(InputDeviceProperties::SEND_EVENT.as_ref())
+            .unwrap()
+            .stream
+            .read()
+            .unwrap()
+            .observe_with_handle(
+                move |send_event: &Value| {
+                    // event_type (u64)
+                    let event_type = send_event.get("event_type");
+                    if event_type.is_none() {
+                        return;
+                    }
+                    let event_type = event_type.unwrap();
+                    if !event_type.is_number() {
+                        // Invalid
+                        return;
+                    }
+                    let event_type = to_event_type(event_type.as_u64().unwrap());
+                    if event_type.is_err() {
+                        // Invalid
+                        return;
+                    }
+                    let event_type = event_type.unwrap();
+
+                    // code (i64 -> i16)
+                    let code = send_event.get("code");
+                    if code.is_none() {
+                        return;
+                    }
+                    let code = code.unwrap();
+                    if !code.is_number() {
+                        // Invalid
+                        return;
+                    }
+                    let code = u16::try_from(code.as_i64().unwrap()).unwrap();
+
+                    // value (bool)
+                    let value = send_event.get("value");
+                    if value.is_none() {
+                        return;
+                    }
+                    let value = value.unwrap();
+                    if !value.is_boolean() {
+                        // Invalid
+                        return;
+                    }
+                    let value = if value.as_bool().unwrap() { i32::MAX } else { 0 };
+
+                    let device = evdev::enumerate().find(|d| physical_path_2.as_str() == d.physical_path().unwrap_or(""));
+                    if device.is_none() {
+                        return;
+                    }
+
+                    let _result = device.unwrap().send_events(&[InputEvent::new(event_type, code, value)]);
+                },
+                handle_id,
+            );
+
+        let (stopper_tx, stopper_rx) = crossbeam::channel::bounded(1);
 
         let entity_instance = e.clone();
 
@@ -73,7 +138,7 @@ impl DeviceInput {
 
                 select! {
                     _ = delay => {
-                        match rx.try_recv() {
+                        match stopper_rx.try_recv() {
                             // Stop thread
                             Ok(_) => break,
                             // Continue thread
@@ -132,9 +197,10 @@ impl DeviceInput {
             }
         });
 
-        Ok(DeviceInput {
+        Ok(InputDevice {
             entity: e.clone(),
-            stopper: tx.clone(),
+            stopper: stopper_tx.clone(),
+            handle_id,
         })
     }
 
@@ -143,16 +209,29 @@ impl DeviceInput {
     }
 }
 
-impl Disconnectable for DeviceInput {
+impl Disconnectable for InputDevice {
     fn disconnect(&self) {
+        debug!("Stopping handling send events");
+        let property = self.entity.properties.get(InputDeviceProperties::SEND_EVENT.as_ref());
+        if property.is_some() {
+            property.unwrap().stream.read().unwrap().remove(self.handle_id);
+        }
         debug!("Stopping thread handling input device");
         let _ = self.stopper.send(());
     }
 }
 
 /// Automatically disconnect streams on destruction
-impl Drop for DeviceInput {
+impl Drop for InputDevice {
     fn drop(&mut self) {
         self.disconnect();
     }
+}
+
+fn to_event_type(event_type: u64) -> Result<EventType, TryFromIntError> {
+    let r_event_type = u16::try_from(event_type);
+    if r_event_type.is_err() {
+        return Err(r_event_type.err().unwrap());
+    }
+    Ok(EventType(r_event_type.unwrap()))
 }

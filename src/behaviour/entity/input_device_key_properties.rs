@@ -12,6 +12,8 @@ pub enum InputDeviceKeyProperties {
     KEY_CODE,
     #[strum(serialize = "key_down")]
     KEY_DOWN,
+    #[strum(serialize = "set_key_down")]
+    SET_KEY_DOWN,
 }
 
 impl InputDeviceKeyProperties {
@@ -20,6 +22,7 @@ impl InputDeviceKeyProperties {
             InputDeviceKeyProperties::KEY => json!(String::new()),
             InputDeviceKeyProperties::KEY_CODE => json!(-1),
             InputDeviceKeyProperties::KEY_DOWN => json!(false),
+            InputDeviceKeyProperties::SET_KEY_DOWN => json!(false),
         }
     }
     pub fn properties() -> NamedProperties {
@@ -27,6 +30,7 @@ impl InputDeviceKeyProperties {
             NamedProperty::from(InputDeviceKeyProperties::KEY),
             NamedProperty::from(InputDeviceKeyProperties::KEY_CODE),
             NamedProperty::from(InputDeviceKeyProperties::KEY_DOWN),
+            NamedProperty::from(InputDeviceKeyProperties::SET_KEY_DOWN),
         ]
     }
 }

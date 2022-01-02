@@ -22,6 +22,11 @@
       "name": "state",
       "data_type": "bool",
       "socket_type": "output"
+    },
+    {
+      "name": "set_state",
+      "data_type": "bool",
+      "socket_type": "input"
     }
   ],
   "extensions": [

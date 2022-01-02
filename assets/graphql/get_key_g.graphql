@@ -1,0 +1,17 @@
+query key_g {
+  instances {
+    key_g: entities(id: "3212d494-2365-543e-87fa-07abdf4315c7") {
+      id,
+      type {name},
+      properties(
+        names: [
+          "name",
+          "key",
+          "key_code",
+          "key_down",
+          "set_key_down"
+        ]
+      )
+    }
+  }
+}
