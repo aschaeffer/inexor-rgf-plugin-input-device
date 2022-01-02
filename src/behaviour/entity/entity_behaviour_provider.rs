@@ -66,7 +66,7 @@ impl InputDeviceEntityBehaviourProvider for InputDeviceEntityBehaviourProviderIm
     fn remove_by_id(&self, id: Uuid) {
         if self.input_device.0.write().unwrap().contains_key(&id) {
             self.input_device.0.write().unwrap().remove(&id);
-            debug!("Removed behaviour {} to entity instance {}", INPUT_DEVICE, id);
+            debug!("Removed behaviour {} from entity instance {}", INPUT_DEVICE, id);
         }
     }
 }
