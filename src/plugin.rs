@@ -42,8 +42,6 @@ pub struct InputDevicePluginImpl {
 
 impl InputDevicePluginImpl {}
 
-impl InputDevicePluginImpl {}
-
 interfaces!(InputDevicePluginImpl: dyn Plugin);
 
 #[async_trait]
