@@ -211,12 +211,12 @@ impl InputDevice {
 
 impl Disconnectable for InputDevice {
     fn disconnect(&self) {
-        debug!("Stopping handling send events");
+        trace!("Disconnecting {} with id {}", INPUT_DEVICE, self.entity.id);
         let property = self.entity.properties.get(InputDeviceProperties::SEND_EVENT.as_ref());
         if property.is_some() {
             property.unwrap().stream.read().unwrap().remove(self.handle_id);
         }
-        debug!("Stopping thread handling input device");
+        trace!("Stopping thread of {} with id {}", INPUT_DEVICE, self.entity.id);
         let _ = self.stopper.send(());
     }
 }
