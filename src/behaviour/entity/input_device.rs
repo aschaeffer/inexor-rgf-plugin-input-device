@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use crate::reactive::BehaviourCreationError;
 use async_std::task;
-use log::{debug, error, trace};
+use log::{error, trace};
 use serde_json::{json, Value};
 
 use crate::behaviour::entity::InputDeviceProperties;
