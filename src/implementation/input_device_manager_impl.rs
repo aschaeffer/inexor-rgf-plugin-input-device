@@ -56,7 +56,7 @@ impl InputDeviceManager for InputDeviceManagerImpl {
     }
 
     fn load_config(&self) {
-        let toml_config = std::fs::read_to_string("./config/input_devices.toml");
+        let toml_config = std::fs::read_to_string(CONFIG_PATH);
         match toml_config {
             Ok(toml_string) => {
                 let input_devices_config: Result<InputDevicesConfig, _> = toml::from_str(&toml_string);
