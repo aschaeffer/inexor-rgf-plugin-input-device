@@ -1,7 +1,6 @@
 use std::sync::{Arc, RwLock};
 
 use async_trait::async_trait;
-use log::debug;
 use waiter_di::*;
 
 use crate::api::InputDeviceManager;
@@ -58,23 +57,19 @@ impl Plugin for InputDevicePluginImpl {
     }
 
     fn init(&self) -> Result<(), PluginError> {
-        debug!("InputDevicePluginModuleImpl::init()");
         Ok(())
     }
 
     fn post_init(&self) -> Result<(), PluginError> {
-        debug!("InputDevicePluginModuleImpl::post_init()");
         self.input_device_manager.init();
         Ok(())
     }
 
     fn pre_shutdown(&self) -> Result<(), PluginError> {
-        debug!("InputDevicePluginModuleImpl::pre_shutdown()");
         Ok(())
     }
 
     fn shutdown(&self) -> Result<(), PluginError> {
-        debug!("InputDevicePluginModuleImpl::shutdown()");
         Ok(())
     }
 
