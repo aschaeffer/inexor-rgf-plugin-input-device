@@ -12,7 +12,7 @@ use crate::plugins::PluginContext;
 use evdev::{Device, LedType};
 use inexor_rgf_core_model::EntityInstance;
 use inexor_rgf_core_plugins::entity_instance_manager::EntityInstanceCreationError;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
@@ -59,7 +59,7 @@ impl InputDeviceLedManager for InputDeviceLedManagerImpl {
         let led_name = format!("{:?}", led);
         let unique_name = format!("{}-{}-{}", device_name, physical_path, led_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
-        let input_device_led = self.create_entity_instance(uuid, unique_name.clone(), led_name.clone(), led);
+        let input_device_led = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), led_name.clone(), led);
         let input_device_led = entity_instance_manager.create(input_device_led);
         self.try_create_led_event(input_device, input_device_led, unique_name, true);
     }
@@ -67,11 +67,12 @@ impl InputDeviceLedManager for InputDeviceLedManagerImpl {
     fn create_any_device_led(&self, input_device: Arc<ReactiveEntityInstance>, led: LedType) {
         let reader = self.context.0.read().unwrap();
         let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
+        let device_name = "any-device";
         let led_name = format!("{:?}", led);
-        let unique_name = format!("any-device-{}", led_name);
+        let unique_name = format!("{}-{}", device_name, led_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
         if !entity_instance_manager.has(uuid) {
-            let input_device_led = self.create_entity_instance(uuid, unique_name.clone(), led_name.clone(), led);
+            let input_device_led = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), led_name.clone(), led);
             let input_device_led = entity_instance_manager.create(input_device_led);
             self.try_create_led_event(input_device, input_device_led, unique_name, false);
         } else {
@@ -79,13 +80,14 @@ impl InputDeviceLedManager for InputDeviceLedManagerImpl {
         }
     }
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, led_name: String, led: LedType) -> EntityInstance {
+    fn create_entity_instance(&self, uuid: Uuid, device_name: String, unique_name: String, led_name: String, led: LedType) -> EntityInstance {
         EntityInstanceBuilder::new(INPUT_DEVICE_LED)
             .id(uuid)
-            .property("name", json!(unique_name))
-            .property(InputDeviceLedProperties::LED.as_ref(), json!(led_name))
-            .property(InputDeviceLedProperties::LED_TYPE.as_ref(), json!(led.0))
-            .property(InputDeviceLedProperties::STATE.as_ref(), json!(false))
+            .property(InputDeviceLedProperties::NAME, json!(unique_name))
+            .property(InputDeviceLedProperties::LABEL, unique_label(device_name, led_name.clone()))
+            .property(InputDeviceLedProperties::LED, json!(led_name))
+            .property(InputDeviceLedProperties::LED_TYPE, json!(led.0))
+            .property(InputDeviceLedProperties::STATE, json!(false))
             .get()
     }
 
@@ -117,4 +119,12 @@ impl InputDeviceLedManager for InputDeviceLedManagerImpl {
             let _send_led_event = relation_instance_manager.create(send_led_event);
         }
     }
+}
+
+fn unique_label(device_name: String, led_name: String) -> Value {
+    json!(format!(
+        "/org/inexor/input/{}/led/{}",
+        device_name.clone().to_lowercase().replace("-", "_").replace(" ", "_"),
+        led_name.clone().to_lowercase().replace("-", "_").replace(" ", "_")
+    ))
 }

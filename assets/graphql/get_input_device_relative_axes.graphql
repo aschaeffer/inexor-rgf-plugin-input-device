@@ -4,9 +4,10 @@ query relative_axes {
       id
       properties(
         names: [
-          "name",
-          "relative_axis",
-          "relative_axis_type",
+          "label"
+          "name"
+          "relative_axis"
+          "relative_axis_type"
           "state"
         ]
       )

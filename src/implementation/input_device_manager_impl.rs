@@ -12,7 +12,7 @@ use crate::builder::EntityInstanceBuilder;
 use crate::config::{InputDeviceConfig, InputDevicesConfig};
 use crate::plugins::PluginContext;
 use evdev::Device;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
@@ -130,13 +130,14 @@ impl InputDeviceManager for InputDeviceManagerImpl {
         let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
         let entity_instance = EntityInstanceBuilder::new(INPUT_DEVICE)
             .id(Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes()))
-            .property(InputDeviceProperties::NAME.as_ref(), json!(device_name))
-            .property(InputDeviceProperties::PHYSICAL_PATH.as_ref(), json!(physical_path))
-            .property(InputDeviceProperties::DRIVER_VERSION.as_ref(), json!(driver_version))
-            .property(InputDeviceProperties::VENDOR.as_ref(), json!(vendor))
-            .property(InputDeviceProperties::PRODUCT.as_ref(), json!(product))
-            .property(InputDeviceProperties::VERSION.as_ref(), json!(version))
-            .property(InputDeviceProperties::EVENT.as_ref(), json!({}))
+            .property(InputDeviceProperties::NAME, json!(device_name))
+            .property(InputDeviceProperties::LABEL, unique_label(device_name.into()))
+            .property(InputDeviceProperties::PHYSICAL_PATH, json!(physical_path))
+            .property(InputDeviceProperties::DRIVER_VERSION, json!(driver_version))
+            .property(InputDeviceProperties::VENDOR, json!(vendor))
+            .property(InputDeviceProperties::PRODUCT, json!(product))
+            .property(InputDeviceProperties::VERSION, json!(version))
+            .property(InputDeviceProperties::EVENT, json!({}))
             .get();
         let reactive_entity_instance = entity_instance_manager.create(entity_instance);
         match reactive_entity_instance {
@@ -166,4 +167,8 @@ impl InputDeviceManager for InputDeviceManagerImpl {
             }
         }
     }
+}
+
+fn unique_label(device_name: String) -> Value {
+    json!(format!("/org/inexor/input/{}", device_name.clone().to_lowercase().replace("-", "_").replace(" ", "_")))
 }

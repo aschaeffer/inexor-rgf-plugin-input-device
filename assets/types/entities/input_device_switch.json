@@ -3,6 +3,7 @@
   "group": "hardware",
   "description": "A physical or virtual switch",
   "components": [
+    "labeled",
     "named",
     "flow_2d",
     "flow_3d"

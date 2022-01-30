@@ -5,9 +5,10 @@ query key_f7 {
       type {name},
       properties(
         names: [
-          "name",
-          "key",
-          "key_code",
+          "label"
+          "name"
+          "key"
+          "key_code"
           "key_down"
         ]
       )

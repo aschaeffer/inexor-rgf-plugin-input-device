@@ -11,7 +11,7 @@ use crate::plugins::PluginContext;
 use evdev::{Device, SwitchType};
 use inexor_rgf_core_model::EntityInstance;
 use inexor_rgf_core_plugins::entity_instance_manager::EntityInstanceCreationError;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
@@ -57,7 +57,7 @@ impl InputDeviceSwitchManager for InputDeviceSwitchManagerImpl {
         let switch_name = format!("{:?}", switch);
         let unique_name = format!("{}-{}-{}", device_name, physical_path, switch_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
-        let input_device_switch = self.create_entity_instance(uuid, unique_name.clone(), switch_name.clone(), switch);
+        let input_device_switch = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), switch_name.clone(), switch);
         let input_device_switch = entity_instance_manager.create(input_device_switch);
         self.try_create_switch_event(input_device, input_device_switch, unique_name);
     }
@@ -65,11 +65,12 @@ impl InputDeviceSwitchManager for InputDeviceSwitchManagerImpl {
     fn create_any_device_switch(&self, input_device: Arc<ReactiveEntityInstance>, switch: SwitchType) {
         let reader = self.context.0.read().unwrap();
         let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
+        let device_name = "any-device";
         let switch_name = format!("{:?}", switch);
-        let unique_name = format!("any-device-{}", switch_name);
+        let unique_name = format!("{}-{}", device_name, switch_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
         if !entity_instance_manager.has(uuid) {
-            let input_device_switch = self.create_entity_instance(uuid, unique_name.clone(), switch_name.clone(), switch);
+            let input_device_switch = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), switch_name.clone(), switch);
             let input_device_switch = entity_instance_manager.create(input_device_switch);
             self.try_create_switch_event(input_device, input_device_switch, unique_name);
         } else {
@@ -77,13 +78,14 @@ impl InputDeviceSwitchManager for InputDeviceSwitchManagerImpl {
         }
     }
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, switch_name: String, switch: SwitchType) -> EntityInstance {
+    fn create_entity_instance(&self, uuid: Uuid, device_name: String, unique_name: String, switch_name: String, switch: SwitchType) -> EntityInstance {
         EntityInstanceBuilder::new(INPUT_DEVICE_SWITCH)
             .id(uuid)
-            .property("name", json!(unique_name))
-            .property(InputDeviceSwitchProperties::SWITCH.as_ref(), json!(switch_name))
-            .property(InputDeviceSwitchProperties::SWITCH_TYPE.as_ref(), json!(switch.0))
-            .property(InputDeviceSwitchProperties::STATE.as_ref(), InputDeviceSwitchProperties::STATE.default_value())
+            .property(InputDeviceSwitchProperties::NAME, json!(unique_name))
+            .property(InputDeviceSwitchProperties::LABEL, unique_label(device_name, switch_name.clone()))
+            .property(InputDeviceSwitchProperties::SWITCH, json!(switch_name))
+            .property(InputDeviceSwitchProperties::SWITCH_TYPE, json!(switch.0))
+            .property(InputDeviceSwitchProperties::STATE, InputDeviceSwitchProperties::STATE.default_value())
             .get()
     }
 
@@ -110,4 +112,12 @@ impl InputDeviceSwitchManager for InputDeviceSwitchManagerImpl {
         let switch_event = RelationInstanceBuilder::new(input_device.id, SWITCH_EVENT, input_device_switch.id).get();
         let _switch_event = relation_instance_manager.create(switch_event);
     }
+}
+
+fn unique_label(device_name: String, switch_name: String) -> Value {
+    json!(format!(
+        "/org/inexor/input/{}/switch/{}",
+        device_name.clone().to_lowercase().replace("-", "_").replace(" ", "_"),
+        switch_name.clone().to_lowercase().replace("-", "_").replace(" ", "_")
+    ))
 }

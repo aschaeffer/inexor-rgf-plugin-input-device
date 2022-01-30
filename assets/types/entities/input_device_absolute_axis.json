@@ -3,6 +3,7 @@
   "group": "hardware",
   "description": "An absolute axis of an input device. Used for touch events and joysticks.",
   "components": [
+    "labeled",
     "named",
     "flow_2d",
     "flow_3d"

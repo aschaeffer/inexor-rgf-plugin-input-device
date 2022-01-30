@@ -4,11 +4,12 @@ query {
       id
       properties(
         names: [
-          "name",
-          "physical_path",
-          "driver_version",
-          "vendor",
-          "product",
+          "label"
+          "name"
+          "physical_path"
+          "driver_version"
+          "vendor"
+          "product"
           "version"
         ]
       )

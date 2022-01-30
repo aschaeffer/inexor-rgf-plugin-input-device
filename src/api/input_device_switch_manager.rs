@@ -19,7 +19,7 @@ pub trait InputDeviceSwitchManager: Send + Sync {
 
     fn create_any_device_switch(&self, input_device: Arc<ReactiveEntityInstance>, switch: SwitchType);
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, switch_name: String, switch: SwitchType) -> EntityInstance;
+    fn create_entity_instance(&self, uuid: Uuid, device_name: String, unique_name: String, switch_name: String, switch: SwitchType) -> EntityInstance;
 
     fn try_create_switch_event(
         &self,

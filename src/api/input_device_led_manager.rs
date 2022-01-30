@@ -19,7 +19,7 @@ pub trait InputDeviceLedManager: Send + Sync {
 
     fn create_any_device_led(&self, input_device: Arc<ReactiveEntityInstance>, led: LedType);
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, key_name: String, led: LedType) -> EntityInstance;
+    fn create_entity_instance(&self, uuid: Uuid, device_name: String, unique_name: String, key_name: String, led: LedType) -> EntityInstance;
 
     fn try_create_led_event(
         &self,

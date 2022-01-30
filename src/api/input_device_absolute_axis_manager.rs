@@ -19,7 +19,14 @@ pub trait InputDeviceAbsoluteAxisManager: Send + Sync {
 
     fn create_any_device_absolute_axis(&self, input_device: Arc<ReactiveEntityInstance>, absolute_axis: AbsoluteAxisType);
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, absolute_axis_name: String, absolute_axis: AbsoluteAxisType) -> EntityInstance;
+    fn create_entity_instance(
+        &self,
+        uuid: Uuid,
+        device_name: String,
+        unique_name: String,
+        absolute_axis_name: String,
+        absolute_axis: AbsoluteAxisType,
+    ) -> EntityInstance;
 
     fn try_create_absolute_axis_event(
         &self,

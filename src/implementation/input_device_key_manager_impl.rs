@@ -12,7 +12,7 @@ use crate::plugins::PluginContext;
 use evdev::{Device, Key};
 use inexor_rgf_core_model::EntityInstance;
 use inexor_rgf_core_plugins::entity_instance_manager::EntityInstanceCreationError;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
@@ -59,7 +59,7 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
         let key_name = format!("{:?}", key);
         let unique_name = format!("{}-{}-{}", device_name, physical_path, key_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
-        let input_device_key = self.create_entity_instance(uuid, unique_name.clone(), key_name.clone(), key);
+        let input_device_key = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), key_name.clone(), key);
         let input_device_key = entity_instance_manager.create(input_device_key);
         self.try_create_key_event(input_device, input_device_key, unique_name, true);
     }
@@ -67,11 +67,12 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
     fn create_any_device_key(&self, input_device: Arc<ReactiveEntityInstance>, key: Key) {
         let reader = self.context.0.read().unwrap();
         let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
+        let device_name = "any-device";
         let key_name = format!("{:?}", key);
-        let unique_name = format!("any-device-{}", key_name);
+        let unique_name = format!("{}-{}", device_name, key_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
         if !entity_instance_manager.has(uuid) {
-            let input_device_key = self.create_entity_instance(uuid, unique_name.clone(), key_name.clone(), key);
+            let input_device_key = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), key_name.clone(), key);
             let input_device_key = entity_instance_manager.create(input_device_key);
             self.try_create_key_event(input_device, input_device_key, unique_name, false);
         } else {
@@ -79,13 +80,14 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
         }
     }
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, key_name: String, key: Key) -> EntityInstance {
+    fn create_entity_instance(&self, uuid: Uuid, device_name: String, unique_name: String, key_name: String, key: Key) -> EntityInstance {
         EntityInstanceBuilder::new(INPUT_DEVICE_KEY)
             .id(uuid)
-            .property("name", json!(unique_name))
-            .property(InputDeviceKeyProperties::KEY.as_ref(), json!(key_name))
-            .property(InputDeviceKeyProperties::KEY_CODE.as_ref(), json!(key.code()))
-            .property(InputDeviceKeyProperties::KEY_DOWN.as_ref(), json!(false))
+            .property(InputDeviceKeyProperties::NAME, json!(unique_name.clone()))
+            .property(InputDeviceKeyProperties::LABEL, unique_label(device_name, key_name.clone()))
+            .property(InputDeviceKeyProperties::KEY, json!(key_name))
+            .property(InputDeviceKeyProperties::KEY_CODE, json!(key.code()))
+            .property(InputDeviceKeyProperties::KEY_DOWN, json!(false))
             .get()
     }
 
@@ -117,4 +119,12 @@ impl InputDeviceKeyManager for InputDeviceKeyManagerImpl {
             let _send_key_event = relation_instance_manager.create(send_key_event);
         }
     }
+}
+
+fn unique_label(device_name: String, key_name: String) -> Value {
+    json!(format!(
+        "/org/inexor/input/{}/key/{}",
+        device_name.clone().to_lowercase().replace("-", "_").replace(" ", "_"),
+        key_name.clone().to_lowercase().replace("-", "_").replace(" ", "_")
+    ))
 }

@@ -4,9 +4,10 @@ query absolute_axes {
       id
       properties(
         names: [
-          "name",
-          "absolute_axis",
-          "absolute_axis_type",
+          "label"
+          "name"
+          "absolute_axis"
+          "absolute_axis_type"
           "state"
         ]
       )

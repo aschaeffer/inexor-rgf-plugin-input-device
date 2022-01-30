@@ -11,7 +11,7 @@ use crate::plugins::PluginContext;
 use evdev::{Device, RelativeAxisType};
 use inexor_rgf_core_model::EntityInstance;
 use inexor_rgf_core_plugins::entity_instance_manager::EntityInstanceCreationError;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
@@ -58,7 +58,7 @@ impl InputDeviceRelativeAxisManager for InputDeviceRelativeAxisManagerImpl {
         let relative_axis_name = format!("{:?}", relative_axis);
         let unique_name = format!("{}-{}-{}", device_name, physical_path, relative_axis_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
-        let input_device_relative_axis = self.create_entity_instance(uuid, unique_name.clone(), relative_axis_name.clone(), relative_axis);
+        let input_device_relative_axis = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), relative_axis_name.clone(), relative_axis);
         let input_device_relative_axis = entity_instance_manager.create(input_device_relative_axis);
         self.try_create_relative_axis_event(input_device, input_device_relative_axis, unique_name);
     }
@@ -66,11 +66,13 @@ impl InputDeviceRelativeAxisManager for InputDeviceRelativeAxisManagerImpl {
     fn create_any_device_relative_axis(&self, input_device: Arc<ReactiveEntityInstance>, relative_axis: RelativeAxisType) {
         let reader = self.context.0.read().unwrap();
         let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
+        let device_name = "any-device";
         let relative_axis_name = format!("{:?}", relative_axis);
-        let unique_name = format!("any-device-{}", relative_axis_name);
+        let unique_name = format!("{}-{}", device_name, relative_axis_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
         if !entity_instance_manager.has(uuid) {
-            let input_device_relative_axis = self.create_entity_instance(uuid, unique_name.clone(), relative_axis_name.clone(), relative_axis);
+            let input_device_relative_axis =
+                self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), relative_axis_name.clone(), relative_axis);
             let input_device_relative_axis = entity_instance_manager.create(input_device_relative_axis);
             self.try_create_relative_axis_event(input_device, input_device_relative_axis, unique_name);
         } else {
@@ -78,13 +80,21 @@ impl InputDeviceRelativeAxisManager for InputDeviceRelativeAxisManagerImpl {
         }
     }
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, relative_axis_name: String, relative_axis: RelativeAxisType) -> EntityInstance {
+    fn create_entity_instance(
+        &self,
+        uuid: Uuid,
+        device_name: String,
+        unique_name: String,
+        relative_axis_name: String,
+        relative_axis: RelativeAxisType,
+    ) -> EntityInstance {
         EntityInstanceBuilder::new(INPUT_DEVICE_RELATIVE_AXIS)
             .id(uuid)
-            .property("name", json!(unique_name))
+            .property(InputDeviceRelativeAxisProperties::NAME, json!(unique_name))
+            .property(InputDeviceRelativeAxisProperties::LABEL, unique_label(device_name, relative_axis_name.clone()))
             .property(InputDeviceRelativeAxisProperties::RELATIVE_AXIS, json!(relative_axis_name))
-            .property(InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE.as_ref(), json!(relative_axis.0))
-            .property(InputDeviceRelativeAxisProperties::STATE.as_ref(), InputDeviceRelativeAxisProperties::STATE.default_value())
+            .property(InputDeviceRelativeAxisProperties::RELATIVE_AXIS_TYPE, json!(relative_axis.0))
+            .property(InputDeviceRelativeAxisProperties::STATE, InputDeviceRelativeAxisProperties::STATE.default_value())
             .get()
     }
 
@@ -111,4 +121,12 @@ impl InputDeviceRelativeAxisManager for InputDeviceRelativeAxisManagerImpl {
         let relative_axis_event = RelationInstanceBuilder::new(input_device.id, RELATIVE_AXIS_EVENT, input_device_relative_axis.id).get();
         let _relative_axis_event = relation_instance_manager.create(relative_axis_event);
     }
+}
+
+fn unique_label(device_name: String, relative_axis_name: String) -> Value {
+    json!(format!(
+        "/org/inexor/input/{}/relative_axis/{}",
+        device_name.clone().to_lowercase().replace("-", "_").replace(" ", "_"),
+        relative_axis_name.clone().to_lowercase().replace("-", "_").replace(" ", "_")
+    ))
 }

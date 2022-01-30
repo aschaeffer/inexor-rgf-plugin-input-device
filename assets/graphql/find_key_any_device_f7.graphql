@@ -1,0 +1,17 @@
+query findAnyKeyF7 {
+  instances {
+    entities(label: "/org/inexor/input/any_device/key/key_f7") {
+      id
+      type {
+        name
+      }
+      properties(names: [
+        "label"
+        "name"
+        "key"
+        "key_code"
+        "key_down"
+      ])
+    }
+  }
+}

@@ -3,7 +3,7 @@ cargo-features = ["strip"]
 [package]
 name = "inexor-rgf-plugin-input-device"
 description = "Inexor - Reactive Graph Flow - Plugin - Input Device"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Andreas Schaeffer <hanack@nooblounge.net>"]
 edition = "2021"
 license = "MIT"
@@ -15,13 +15,14 @@ crossbeam = "0.8"
 evdev = { version = "0.11", features = ["tokio"] }
 futures = "0.3"
 futures-timer = "3.0"
-indradb-lib = "1"
+indradb-lib = "3"
 log = { version = "0.4", features = ["std", "serde"] }
 log4rs = { version = "1.0", features = ["console_appender", "file_appender"]}
 query_interface = "0.3"
 rust-embed = { version = "6.2", features = ["debug-embed", "compression"] }
 serde = { version = "1.0", features = [ "derive" ] }
 serde_json = "1.0"
+shellexpand = "2.1"
 strum = { version = "0.23", features = ["derive"] }
 strum_macros = "0.23"
 toml = "0.5"

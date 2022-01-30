@@ -4,9 +4,10 @@ query keys {
       id
       properties(
         names: [
-          "name",
-          "switch",
-          "switch_type",
+          "label"
+          "name"
+          "switch"
+          "switch_type"
           "state"
         ]
       )

@@ -11,7 +11,7 @@ use crate::plugins::PluginContext;
 use evdev::{AbsoluteAxisType, Device};
 use inexor_rgf_core_model::EntityInstance;
 use inexor_rgf_core_plugins::entity_instance_manager::EntityInstanceCreationError;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
@@ -58,7 +58,7 @@ impl InputDeviceAbsoluteAxisManager for InputDeviceAbsoluteAxisManagerImpl {
         let absolute_axis_name = format!("{:?}", absolute_axis);
         let unique_name = format!("{}-{}-{}", device_name, physical_path, absolute_axis_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
-        let input_device_absolute_axis = self.create_entity_instance(uuid, unique_name.clone(), absolute_axis_name.clone(), absolute_axis);
+        let input_device_absolute_axis = self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), absolute_axis_name.clone(), absolute_axis);
         let input_device_absolute_axis = entity_instance_manager.create(input_device_absolute_axis);
         self.try_create_absolute_axis_event(input_device, input_device_absolute_axis, unique_name);
     }
@@ -66,11 +66,13 @@ impl InputDeviceAbsoluteAxisManager for InputDeviceAbsoluteAxisManagerImpl {
     fn create_any_device_absolute_axis(&self, input_device: Arc<ReactiveEntityInstance>, absolute_axis: AbsoluteAxisType) {
         let reader = self.context.0.read().unwrap();
         let entity_instance_manager = reader.as_ref().unwrap().get_entity_instance_manager().clone();
+        let device_name = "any-device";
         let absolute_axis_name = format!("{:?}", absolute_axis);
-        let unique_name = format!("any-device-{}", absolute_axis_name);
+        let unique_name = format!("{}-{}", device_name, absolute_axis_name);
         let uuid = Uuid::new_v5(&NAMESPACE_INPUT_DEVICE, unique_name.as_bytes());
         if !entity_instance_manager.has(uuid) {
-            let input_device_absolute_axis = self.create_entity_instance(uuid, unique_name.clone(), absolute_axis_name.clone(), absolute_axis);
+            let input_device_absolute_axis =
+                self.create_entity_instance(uuid, device_name.into(), unique_name.clone(), absolute_axis_name.clone(), absolute_axis);
             let input_device_absolute_axis = entity_instance_manager.create(input_device_absolute_axis);
             self.try_create_absolute_axis_event(input_device, input_device_absolute_axis, unique_name);
         } else {
@@ -78,13 +80,21 @@ impl InputDeviceAbsoluteAxisManager for InputDeviceAbsoluteAxisManagerImpl {
         }
     }
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, absolute_axis_name: String, absolute_axis: AbsoluteAxisType) -> EntityInstance {
+    fn create_entity_instance(
+        &self,
+        uuid: Uuid,
+        device_name: String,
+        unique_name: String,
+        absolute_axis_name: String,
+        absolute_axis: AbsoluteAxisType,
+    ) -> EntityInstance {
         EntityInstanceBuilder::new(INPUT_DEVICE_ABSOLUTE_AXIS)
             .id(uuid)
-            .property("name", json!(unique_name))
-            .property(InputDeviceAbsoluteAxisProperties::ABSOLUTE_AXIS.as_ref(), json!(absolute_axis_name))
-            .property(InputDeviceAbsoluteAxisProperties::ABSOLUTE_AXIS_TYPE.as_ref(), json!(absolute_axis.0))
-            .property(InputDeviceAbsoluteAxisProperties::STATE.as_ref(), InputDeviceAbsoluteAxisProperties::STATE.default_value())
+            .property(InputDeviceAbsoluteAxisProperties::NAME, json!(unique_name))
+            .property(InputDeviceAbsoluteAxisProperties::LABEL, unique_label(device_name, absolute_axis_name.clone()))
+            .property(InputDeviceAbsoluteAxisProperties::ABSOLUTE_AXIS, json!(absolute_axis_name))
+            .property(InputDeviceAbsoluteAxisProperties::ABSOLUTE_AXIS_TYPE, json!(absolute_axis.0))
+            .property(InputDeviceAbsoluteAxisProperties::STATE, InputDeviceAbsoluteAxisProperties::STATE.default_value())
             .get()
     }
 
@@ -111,4 +121,12 @@ impl InputDeviceAbsoluteAxisManager for InputDeviceAbsoluteAxisManagerImpl {
         let absolute_axis_event = RelationInstanceBuilder::new(input_device.id, ABSOLUTE_AXIS_EVENT, input_device_absolute_axis.id).get();
         let _absolute_axis_event = relation_instance_manager.create(absolute_axis_event);
     }
+}
+
+fn unique_label(device_name: String, absolute_axis_name: String) -> Value {
+    json!(format!(
+        "/org/inexor/input/{}/absolute_axis/{}",
+        device_name.clone().to_lowercase().replace("-", "_").replace(" ", "_"),
+        absolute_axis_name.clone().to_lowercase().replace("-", "_").replace(" ", "_")
+    ))
 }

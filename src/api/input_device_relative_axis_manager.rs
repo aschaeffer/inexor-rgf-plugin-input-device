@@ -19,7 +19,14 @@ pub trait InputDeviceRelativeAxisManager: Send + Sync {
 
     fn create_any_device_relative_axis(&self, input_device: Arc<ReactiveEntityInstance>, relative_axis: RelativeAxisType);
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, relative_axis_name: String, relative_axis: RelativeAxisType) -> EntityInstance;
+    fn create_entity_instance(
+        &self,
+        uuid: Uuid,
+        device_name: String,
+        unique_name: String,
+        relative_axis_name: String,
+        relative_axis: RelativeAxisType,
+    ) -> EntityInstance;
 
     fn try_create_relative_axis_event(
         &self,

@@ -1,4 +1,4 @@
-use indradb::NamedProperty;
+use indradb::{Identifier, NamedProperty};
 use inexor_rgf_core_reactive::NamedProperties;
 use serde_json::{json, Value};
 use strum_macros::{AsRefStr, Display, IntoStaticStr};
@@ -8,6 +8,8 @@ use strum_macros::{AsRefStr, Display, IntoStaticStr};
 pub enum InputDeviceProperties {
     #[strum(serialize = "name")]
     NAME,
+    #[strum(serialize = "label")]
+    LABEL,
     #[strum(serialize = "physical_path")]
     PHYSICAL_PATH,
     #[strum(serialize = "driver_version")]
@@ -27,7 +29,8 @@ pub enum InputDeviceProperties {
 impl InputDeviceProperties {
     pub fn default_value(&self) -> Value {
         match self {
-            InputDeviceProperties::NAME => json!(""),
+            InputDeviceProperties::NAME => json!(String::new()),
+            InputDeviceProperties::LABEL => json!(String::new()),
             InputDeviceProperties::PHYSICAL_PATH => json!(""),
             InputDeviceProperties::DRIVER_VERSION => json!("1.0.0"),
             InputDeviceProperties::VENDOR => json!(0),
@@ -40,6 +43,7 @@ impl InputDeviceProperties {
     pub fn properties() -> NamedProperties {
         vec![
             NamedProperty::from(InputDeviceProperties::NAME),
+            NamedProperty::from(InputDeviceProperties::LABEL),
             NamedProperty::from(InputDeviceProperties::PHYSICAL_PATH),
             NamedProperty::from(InputDeviceProperties::DRIVER_VERSION),
             NamedProperty::from(InputDeviceProperties::VENDOR),
@@ -54,7 +58,7 @@ impl InputDeviceProperties {
 impl From<InputDeviceProperties> for NamedProperty {
     fn from(p: InputDeviceProperties) -> Self {
         NamedProperty {
-            name: p.to_string(),
+            name: Identifier::new(p.to_string()).unwrap(),
             value: p.default_value(),
         }
     }

@@ -3,6 +3,7 @@
   "group": "hardware",
   "description": "A relative axis of an input device",
   "components": [
+    "labeled",
     "named",
     "flow_2d",
     "flow_3d"

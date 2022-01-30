@@ -19,7 +19,7 @@ pub trait InputDeviceKeyManager: Send + Sync {
 
     fn create_any_device_key(&self, input_device: Arc<ReactiveEntityInstance>, key: Key);
 
-    fn create_entity_instance(&self, uuid: Uuid, unique_name: String, key_name: String, key: Key) -> EntityInstance;
+    fn create_entity_instance(&self, uuid: Uuid, device_name: String, unique_name: String, key_name: String, key: Key) -> EntityInstance;
 
     fn try_create_key_event(
         &self,

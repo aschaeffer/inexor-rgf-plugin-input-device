@@ -3,6 +3,7 @@
   "group": "hardware",
   "description": "Input Device, for example a keyboard",
   "components": [
+    "labeled",
     "named",
     "flow_2d",
     "flow_3d"
