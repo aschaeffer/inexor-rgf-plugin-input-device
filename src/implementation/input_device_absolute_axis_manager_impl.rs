@@ -1,6 +1,6 @@
+use crate::di::*;
 use async_trait::async_trait;
 use log::{error, trace};
-use waiter_di::*;
 
 use crate::api::{InputDeviceAbsoluteAxisManager, INPUT_DEVICE_ABSOLUTE_AXIS, NAMESPACE_INPUT_DEVICE};
 use crate::behaviour::entity::InputDeviceAbsoluteAxisProperties;

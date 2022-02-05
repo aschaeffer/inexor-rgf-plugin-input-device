@@ -1,6 +1,6 @@
+use crate::di::*;
 use async_trait::async_trait;
 use log::{debug, error, trace};
-use waiter_di::*;
 
 use crate::api::{
     InputDeviceAbsoluteAxisManager, InputDeviceKeyManager, InputDeviceLedManager, InputDeviceManager, InputDeviceRelativeAxisManager, InputDeviceSwitchManager,

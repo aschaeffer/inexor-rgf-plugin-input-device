@@ -1,7 +1,7 @@
 use std::sync::{Arc, RwLock};
 
+use crate::di::*;
 use async_trait::async_trait;
-use waiter_di::*;
 
 use crate::api::InputDeviceManager;
 use crate::behaviour::entity::entity_behaviour_provider::InputDeviceEntityBehaviourProviderImpl;

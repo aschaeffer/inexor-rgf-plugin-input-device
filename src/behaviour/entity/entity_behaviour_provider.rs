@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
+use crate::di::*;
 use async_trait::async_trait;
 use log::debug;
 use uuid::Uuid;
-use waiter_di::*;
 
 use crate::behaviour::entity::input_device::InputDevice;
 use crate::model::ReactiveEntityInstance;
@@ -14,7 +14,7 @@ const INPUT_DEVICE: &'static str = "input_device";
 #[wrapper]
 pub struct InputDeviceStorage(std::sync::RwLock<std::collections::HashMap<Uuid, std::sync::Arc<InputDevice>>>);
 
-#[waiter_di::provides]
+#[provides]
 fn create_input_device_storage() -> InputDeviceStorage {
     InputDeviceStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }

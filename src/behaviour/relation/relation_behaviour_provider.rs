@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
+use crate::di::*;
 use async_trait::async_trait;
 use indradb::EdgeKey;
 use log::trace;
-use waiter_di::*;
 
 use crate::behaviour::relation::send_key_event::SendKeyEvent;
 use crate::behaviour::relation::send_led_event::SendLedEvent;
@@ -47,37 +47,37 @@ pub struct AbsoluteAxisEventRelationBehaviourStorage(std::sync::RwLock<std::coll
 #[wrapper]
 pub struct SwitchEventRelationBehaviourStorage(std::sync::RwLock<std::collections::HashMap<EdgeKey, std::sync::Arc<SwitchEvent>>>);
 
-#[waiter_di::provides]
+#[provides]
 fn create_key_event_relation_behaviour_storage() -> KeyEventRelationBehaviourStorage {
     KeyEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }
 
-#[waiter_di::provides]
+#[provides]
 fn create_send_key_event_relation_behaviour_storage() -> SendKeyEventRelationBehaviourStorage {
     SendKeyEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }
 
-#[waiter_di::provides]
+#[provides]
 fn create_led_event_relation_behaviour_storage() -> LedEventRelationBehaviourStorage {
     LedEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }
 
-#[waiter_di::provides]
+#[provides]
 fn create_send_led_event_relation_behaviour_storage() -> SendLedEventRelationBehaviourStorage {
     SendLedEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }
 
-#[waiter_di::provides]
+#[provides]
 fn create_relative_axis_event_relation_behaviour_storage() -> RelativeAxisEventRelationBehaviourStorage {
     RelativeAxisEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }
 
-#[waiter_di::provides]
+#[provides]
 fn create_absolute_axis_event_relation_behaviour_storage() -> AbsoluteAxisEventRelationBehaviourStorage {
     AbsoluteAxisEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }
 
-#[waiter_di::provides]
+#[provides]
 fn create_switch_event_relation_behaviour_storage() -> SwitchEventRelationBehaviourStorage {
     SwitchEventRelationBehaviourStorage(std::sync::RwLock::new(std::collections::HashMap::new()))
 }
