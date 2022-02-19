@@ -36,15 +36,15 @@ type EntityInstance {
   id: UUID!
   "List of relation instances which ends at this entity instance."
   inbound(
-    "Unimplemented"
-    typeName: String
+    "The inbound relation type"
+    type: String
   ): [RelationInstance!]!
   "The label of the entity instance if available."
   label: String
   "List of relation instances which starts at this entity instance."
   outbound(
-    "Unimplemented"
-    typeName: String
+    "The outbound relation type"
+    type: String
   ): [RelationInstance!]!
   """
 
