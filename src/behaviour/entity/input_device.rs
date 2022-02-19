@@ -46,9 +46,9 @@ impl InputDevice {
 
         let device = evdev::enumerate().find(|d| physical_path.as_str() == d.physical_path().unwrap_or(""));
         if device.is_none() {
-            return Err(BehaviourCreationError.into());
+            return Err(BehaviourCreationError);
         }
-        let mut device = device.unwrap();
+        let device = device.unwrap();
 
         let handle_id = e.properties.get(InputDeviceProperties::SEND_EVENT.as_ref()).unwrap().id.as_u128();
 
