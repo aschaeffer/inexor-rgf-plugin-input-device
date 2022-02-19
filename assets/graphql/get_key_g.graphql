@@ -1,8 +1,11 @@
 query key_g {
   instances {
     key_g: entities(id: "3212d494-2365-543e-87fa-07abdf4315c7") {
-      id,
-      type {name},
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
           "name",
@@ -11,7 +14,14 @@ query key_g {
           "key_down",
           "set_key_down"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

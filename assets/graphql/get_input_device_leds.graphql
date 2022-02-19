@@ -1,16 +1,23 @@
 query leds {
   instances {
-    leds: entities(entityType: "input_device_led") {
+    leds: entities(type: "input_device_led") {
       id
+      label
       properties(
         names: [
-          "label"
           "name"
           "led"
           "led_type"
           "state"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

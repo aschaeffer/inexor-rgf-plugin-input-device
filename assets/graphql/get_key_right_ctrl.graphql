@@ -1,8 +1,11 @@
 query key_right_ctrl {
   instances {
     key_right_ctrl: entities(id: "0c76e8d1-5a77-56b9-80eb-fd8e219c4133") {
-      id,
-      type {name},
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
           "name",
@@ -10,7 +13,14 @@ query key_right_ctrl {
           "key_code",
           "key_down"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

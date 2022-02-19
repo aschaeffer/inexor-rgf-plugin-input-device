@@ -1,17 +1,26 @@
 query key_f7 {
   instances {
     key_f7: entities(id: "c7ec76e0-40e8-587e-bc89-e9cd31fa75a0") {
-      id,
-      type {name},
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
-          "label"
           "name"
           "key"
           "key_code"
           "key_down"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

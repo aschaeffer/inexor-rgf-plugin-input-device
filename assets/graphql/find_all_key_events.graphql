@@ -1,0 +1,33 @@
+# This example shows how to query the relations of type key_event
+# The relation connects an input device with a key and propagates the key events.
+query findKeyEvents {
+  instances {
+    relations(type: "key_event") {
+      type {
+        name
+      }
+      outbound {
+        label
+      }
+      inbound {
+        label
+        properties(name: "key_down") {
+          name
+          value
+          type {
+            dataType
+            socketType
+          }
+        }
+      }
+      properties {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ mutation {
   instances {
     entities {
       update(
-      id: "9c019740-f0a2-5628-a1d2-90427f63f64e",
+      id: "9c019740-f0a2-5628-a1d2-90427f63f64e"
         properties: [
           {
             name: "set_state",
@@ -10,8 +10,11 @@ mutation {
           }
         ]
       ) {
-        id,
-        type {name},
+        id
+        label
+        type {
+          name
+        }
         properties(
           names: [
             "name",
@@ -20,7 +23,14 @@ mutation {
             "state"
             "set_state"
           ]
-        )
+        ) {
+          name
+          value
+          type {
+            dataType
+            socketType
+          }
+        }
       }
     }
   }

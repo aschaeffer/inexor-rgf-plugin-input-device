@@ -1,25 +1,59 @@
 query keys_right_ctrl_and_esc {
   instances {
     keys_right_ctrl_and_esc: entities(id: "badadc77-62bc-4971-9882-aafde08ccb8f") {
-      id,
-      type {name},
-      properties
+      id
+      label
+      type {
+        name
+      }
+      properties {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     },
     key_esc: entities(id: "fe4f8f9a-7f83-5385-b8ba-de75a01e1661") {
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
           "key",
           "key_down"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     },
     key_right_ctrl: entities(id: "0c76e8d1-5a77-56b9-80eb-fd8e219c4133") {
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
           "key",
           "key_down"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

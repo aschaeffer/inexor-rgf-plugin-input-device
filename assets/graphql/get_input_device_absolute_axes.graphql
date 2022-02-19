@@ -1,16 +1,23 @@
 query absolute_axes {
   instances {
-    absolute_axes: entities(entityType: "input_device_absolute_axis") {
+    absolute_axes: entities(type: "input_device_absolute_axis") {
       id
+      label
       properties(
         names: [
-          "label"
           "name"
           "absolute_axis"
           "absolute_axis_type"
           "state"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

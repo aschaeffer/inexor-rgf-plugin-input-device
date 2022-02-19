@@ -1,10 +1,10 @@
 query {
   instances {
-    input_devices: entities(entityType: "input_device") {
+    input_devices: entities(type: "input_device") {
       id
+      label
       properties(
         names: [
-          "label"
           "name"
           "physical_path"
           "driver_version"
@@ -12,7 +12,14 @@ query {
           "product"
           "version"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

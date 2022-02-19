@@ -2,18 +2,31 @@ query findInputDeviceRazerBasiliskXHyperspeed {
   instances {
     entities(label: "/org/inexor/input/razer_razer_basilisk_x_hyperspeed") {
       id
+      label
       type {
         name
+        description
       }
       properties(names: [
-        "label"
         "name"
         "physical_path"
         "driver_version"
         "vendor"
         "product"
         "version"
-      ])
+      ]) {
+        name
+        value
+        type {
+          name
+          description
+          dataType
+          socketType
+          extensions {
+            name
+          }
+        }
+      }
     }
   }
 }

@@ -1,8 +1,11 @@
 query mouse_button_right {
   instances {
     mouse_button_right: entities(id: "4b5eadbb-33ab-5c50-a24c-b743017550c4") {
-      id,
-      type {name},
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
           "name",
@@ -10,7 +13,14 @@ query mouse_button_right {
           "key_code",
           "key_down"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

@@ -1,16 +1,23 @@
 query keys {
   instances {
-    keys: entities(entityType: "input_device_key") {
+    keys: entities(type: "input_device_key") {
       id
+      label
       properties(
         names: [
-          "label"
           "name"
           "key"
           "key_code"
           "key_down"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

@@ -1,16 +1,23 @@
 query relative_axes {
   instances {
-    relative_axes: entities(entityType: "input_device_relative_axis") {
+    relative_axes: entities(type: "input_device_relative_axis") {
       id
+      label
       properties(
         names: [
-          "label"
           "name"
           "relative_axis"
           "relative_axis_type"
           "state"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

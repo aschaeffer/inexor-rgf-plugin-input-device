@@ -2,16 +2,23 @@ query findRazerBlackwidowV3F8 {
   instances {
     entities(label: "/org/inexor/input/razer_razer_blackwidow_v3/key/key_f8") {
       id
+      label
       type {
         name
       }
       properties(names: [
-        "label"
         "name"
         "key"
         "key_code"
         "key_down"
-      ])
+      ]) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

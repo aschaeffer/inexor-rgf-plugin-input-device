@@ -1,8 +1,11 @@
 query led_caps_lock {
   instances {
     led_caps_lock: entities(id: "d14b374c-115c-59db-95ad-67a62d7850ef") {
-      id,
-      type {name},
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
           "name",
@@ -10,7 +13,14 @@ query led_caps_lock {
           "led_type",
           "state"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }

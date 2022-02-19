@@ -1,8 +1,11 @@
 query led_num_lock {
   instances {
     led_num_lock: entities(id: "a9316288-2431-5958-a85d-f746d8f89a93") {
-      id,
-      type {name},
+      id
+      label
+      type {
+        name
+      }
       properties(
         names: [
           "name",
@@ -10,7 +13,14 @@ query led_num_lock {
           "led_type",
           "state"
         ]
-      )
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
     }
   }
 }
