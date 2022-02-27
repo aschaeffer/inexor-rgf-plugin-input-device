@@ -1,0 +1,35 @@
+query {
+  instances {
+    keyEvents: relations(type: "key_event") {
+      outbound {
+        id
+      }
+      type {
+        name
+      }
+      inbound {
+        id
+      }
+      components
+      behaviours
+      properties(
+        names: [
+          "name"
+          "physical_path"
+          "driver_version"
+          "vendor"
+          "product"
+          "version"
+        ]
+      ) {
+        name
+        value
+        type {
+          dataType
+          socketType
+        }
+      }
+      behaviours
+    }
+  }
+}
