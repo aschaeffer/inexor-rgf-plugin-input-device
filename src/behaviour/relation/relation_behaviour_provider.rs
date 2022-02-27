@@ -153,13 +153,14 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
             return;
         }
         let edge_key = edge_key.unwrap();
-        let key_event = KeyEvent::new(relation_instance);
+        let key_event = KeyEvent::new(relation_instance.clone());
         if key_event.is_ok() {
             self.key_event_relation_behaviours
                 .0
                 .write()
                 .unwrap()
                 .insert(edge_key.clone(), Arc::new(key_event.unwrap()));
+            relation_instance.add_behaviour(KEY_EVENT);
             trace!("Added relation behaviour {} to relation instance {:?}", KEY_EVENT, edge_key);
         }
     }
@@ -171,6 +172,7 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         }
         let edge_key = edge_key.unwrap();
         self.key_event_relation_behaviours.0.write().unwrap().remove(&edge_key);
+        relation_instance.remove_behaviour(KEY_EVENT);
         trace!("Removed behaviour {} from relation instance {:?}", KEY_EVENT, edge_key);
     }
 
@@ -180,13 +182,14 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
             return;
         }
         let edge_key = edge_key.unwrap();
-        let send_key_event = SendKeyEvent::new(relation_instance);
+        let send_key_event = SendKeyEvent::new(relation_instance.clone());
         if send_key_event.is_ok() {
             self.send_key_event_relation_behaviours
                 .0
                 .write()
                 .unwrap()
                 .insert(edge_key.clone(), Arc::new(send_key_event.unwrap()));
+            relation_instance.add_behaviour(SEND_KEY_EVENT);
             trace!("Added relation behaviour {} to relation instance {:?}", SEND_KEY_EVENT, edge_key);
         }
     }
@@ -198,6 +201,7 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         }
         let edge_key = edge_key.unwrap();
         self.send_key_event_relation_behaviours.0.write().unwrap().remove(&edge_key);
+        relation_instance.remove_behaviour(SEND_KEY_EVENT);
         trace!("Removed behaviour {} from relation instance {:?}", SEND_KEY_EVENT, edge_key);
     }
 
@@ -207,13 +211,14 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
             return;
         }
         let edge_key = edge_key.unwrap();
-        let led_event = LedEvent::new(relation_instance);
+        let led_event = LedEvent::new(relation_instance.clone());
         if led_event.is_ok() {
             self.led_event_relation_behaviours
                 .0
                 .write()
                 .unwrap()
                 .insert(edge_key.clone(), Arc::new(led_event.unwrap()));
+            relation_instance.add_behaviour(LED_EVENT);
             trace!("Added relation behaviour {} to relation instance {:?}", LED_EVENT, edge_key);
         }
     }
@@ -225,6 +230,7 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         }
         let edge_key = edge_key.unwrap();
         self.led_event_relation_behaviours.0.write().unwrap().remove(&edge_key);
+        relation_instance.remove_behaviour(LED_EVENT);
         trace!("Removed behaviour {} from relation instance {:?}", LED_EVENT, edge_key);
     }
 
@@ -234,13 +240,14 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
             return;
         }
         let edge_key = edge_key.unwrap();
-        let send_led_event = SendLedEvent::new(relation_instance);
+        let send_led_event = SendLedEvent::new(relation_instance.clone());
         if send_led_event.is_ok() {
             self.send_led_event_relation_behaviours
                 .0
                 .write()
                 .unwrap()
                 .insert(edge_key.clone(), Arc::new(send_led_event.unwrap()));
+            relation_instance.add_behaviour(SEND_LED_EVENT);
             trace!("Added relation behaviour {} to relation instance {:?}", SEND_LED_EVENT, edge_key);
         }
     }
@@ -252,6 +259,7 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         }
         let edge_key = edge_key.unwrap();
         self.send_led_event_relation_behaviours.0.write().unwrap().remove(&edge_key);
+        relation_instance.remove_behaviour(SEND_LED_EVENT);
         trace!("Removed behaviour {} from relation instance {:?}", SEND_LED_EVENT, edge_key);
     }
 
@@ -261,13 +269,14 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
             return;
         }
         let edge_key = edge_key.unwrap();
-        let relative_axis_event = RelativeAxisEvent::new(relation_instance);
+        let relative_axis_event = RelativeAxisEvent::new(relation_instance.clone());
         if relative_axis_event.is_ok() {
             self.relative_axis_event_relation_behaviours
                 .0
                 .write()
                 .unwrap()
                 .insert(edge_key.clone(), Arc::new(relative_axis_event.unwrap()));
+            relation_instance.add_behaviour(RELATIVE_AXIS_EVENT);
             trace!("Added relation behaviour {} to relation instance {:?}", RELATIVE_AXIS_EVENT, edge_key);
         }
     }
@@ -279,6 +288,7 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         }
         let edge_key = edge_key.unwrap();
         self.relative_axis_event_relation_behaviours.0.write().unwrap().remove(&edge_key);
+        relation_instance.remove_behaviour(RELATIVE_AXIS_EVENT);
         trace!("Removed behaviour {} from relation instance {:?}", RELATIVE_AXIS_EVENT, edge_key);
     }
 
@@ -288,13 +298,14 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
             return;
         }
         let edge_key = edge_key.unwrap();
-        let absolute_axis_event = AbsoluteAxisEvent::new(relation_instance);
+        let absolute_axis_event = AbsoluteAxisEvent::new(relation_instance.clone());
         if absolute_axis_event.is_ok() {
             self.absolute_axis_event_relation_behaviours
                 .0
                 .write()
                 .unwrap()
                 .insert(edge_key.clone(), Arc::new(absolute_axis_event.unwrap()));
+            relation_instance.add_behaviour(ABSOLUTE_AXIS_EVENT);
             trace!("Added relation behaviour {} to relation instance {:?}", ABSOLUTE_AXIS_EVENT, edge_key);
         }
     }
@@ -306,6 +317,7 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         }
         let edge_key = edge_key.unwrap();
         self.absolute_axis_event_relation_behaviours.0.write().unwrap().remove(&edge_key);
+        relation_instance.remove_behaviour(ABSOLUTE_AXIS_EVENT);
         trace!("Removed behaviour {} from relation instance {:?}", ABSOLUTE_AXIS_EVENT, edge_key);
     }
 
@@ -315,13 +327,14 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
             return;
         }
         let edge_key = edge_key.unwrap();
-        let switch_event = SwitchEvent::new(relation_instance);
+        let switch_event = SwitchEvent::new(relation_instance.clone());
         if switch_event.is_ok() {
             self.switch_event_relation_behaviours
                 .0
                 .write()
                 .unwrap()
                 .insert(edge_key.clone(), Arc::new(switch_event.unwrap()));
+            relation_instance.add_behaviour(SWITCH_EVENT);
             trace!("Added relation behaviour {} to relation instance {:?}", SWITCH_EVENT, edge_key);
         }
     }
@@ -333,6 +346,7 @@ impl InputDeviceRelationBehaviourProvider for InputDeviceRelationBehaviourProvid
         }
         let edge_key = edge_key.unwrap();
         self.switch_event_relation_behaviours.0.write().unwrap().remove(&edge_key);
+        relation_instance.remove_behaviour(SWITCH_EVENT);
         trace!("Removed behaviour {} from relation instance {:?}", SWITCH_EVENT, edge_key);
     }
 
