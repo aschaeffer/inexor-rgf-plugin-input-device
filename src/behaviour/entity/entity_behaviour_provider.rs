@@ -50,16 +50,18 @@ impl InputDeviceEntityBehaviourProviderImpl {
 impl InputDeviceEntityBehaviourProvider for InputDeviceEntityBehaviourProviderImpl {
     fn create_input_device(&self, entity_instance: Arc<ReactiveEntityInstance>) {
         let id = entity_instance.id;
-        let device_key = InputDevice::new(entity_instance);
+        let device_key = InputDevice::new(entity_instance.clone());
         if device_key.is_ok() {
             let input_device = Arc::new(device_key.unwrap());
             self.input_device.0.write().unwrap().insert(id, input_device);
+            entity_instance.add_behaviour(INPUT_DEVICE);
             debug!("Added behaviour {} to entity instance {}", INPUT_DEVICE, id);
         }
     }
 
     fn remove_input_device(&self, entity_instance: Arc<ReactiveEntityInstance>) {
         self.input_device.0.write().unwrap().remove(&entity_instance.id);
+        entity_instance.remove_behaviour(INPUT_DEVICE);
         debug!("Removed behaviour {} from entity instance {}", INPUT_DEVICE, entity_instance.id);
     }
 
